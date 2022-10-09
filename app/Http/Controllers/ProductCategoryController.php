@@ -35,7 +35,6 @@ class ProductCategoryController extends Controller
 
     public function store(ProductCategoryStoreRequest $request)
     {
-        // dd($request->all());
         return $this->product_category->newInstance()->fill($request->all())->save() ? true : false;
     }
 

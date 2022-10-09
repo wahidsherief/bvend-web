@@ -24,7 +24,8 @@ class ProductCategoryStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'category' => 'required|unique:product_categories| min:3'
+            // 'category' => 'required|unique:product_categories'
+            'category' => 'required'
         ];
     }
 }
