@@ -24,3 +24,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/product/categories', [ProductCategoryController::class, 'index']);
 Route::post('/product/category/create', [ProductCategoryController::class, 'store']);
+Route::put('/product/category/update/{id}', [ProductCategoryController::class, 'update']);
+Route::delete('/product/category/delete/{id}', [ProductCategoryController::class, 'delete']);

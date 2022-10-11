@@ -35,16 +35,25 @@ class ProductCategoryController extends Controller
 
     public function store(ProductCategoryStoreRequest $request)
     {
-        return $this->product_category->newInstance()->fill($request->all())->save() ? true : false;
+        return
+            $this->product_category->newInstance()->fill($request->all())->save()
+            ? $this->product_category->all()
+            : false;
     }
 
     public function update(ProductCategoryUpdateRequest $request, $id)
     {
-        return $this->product_category->find($id)->update($request->all()) ? true : false;
+        return
+            $this->product_category->find($id)->update($request->all())
+            ? $this->product_category->all()
+            : false;
     }
 
     public function delete($id)
     {
-        return $this->product_category->find($id)->delete() ? true : false;
+        return
+            $this->product_category->find($id)->delete()
+            ? $this->product_category->all()
+            : false;
     }
 }

@@ -24,7 +24,7 @@ class ProductCategoryUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'category' => 'required|min:3'
+            'category' => 'required'
         ];
     }
 }
