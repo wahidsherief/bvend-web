@@ -195,6 +195,12 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /**
+         *
+         * extra providers for bvend
+         */
+        Barryvdh\Debugbar\ServiceProvider::class,
+
     ],
 
     /*
