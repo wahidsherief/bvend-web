@@ -22,7 +22,7 @@ class ProductController extends Controller
     {
         // return  json_encode($this->product->with('category')->get());
         return
-        $this->product->with('category')->get()->toArray();
+        $this->product->with('category')->get();
         // return $this->product->all()->toJson();
     }
 
@@ -40,7 +40,7 @@ class ProductController extends Controller
     {
         return
             $this->product->newInstance()->fill($request->all())->save()
-            ? $this->product->all()
+            ? $this->product->with('category')->get()
             : false;
     }
 
@@ -48,7 +48,7 @@ class ProductController extends Controller
     {
         return
             $this->product->find($id)->update($request->all())
-            ? $this->product->all()
+            ? $this->product->with('category')->get()
             : false;
     }
 
@@ -56,7 +56,7 @@ class ProductController extends Controller
     {
         return
             $this->product->find($id)->delete()
-            ? $this->product->all()
+            ? $this->product->with('category')->get()
             : false;
     }
 }
