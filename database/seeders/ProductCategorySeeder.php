@@ -18,17 +18,17 @@ class ProductCategorySeeder extends Seeder
         $data = [
             [
                 'id' => 1,
-                'category' => 'Chips',
+                'name' => 'Chips',
                 'brand' => 'Bombay Sweets',
             ],
             [
                 'id' => 2,
-                'category' => 'Shoe',
+                'name' => 'Shoe',
                 'brand' => 'Nike',
             ],
             [
                 'id' => 3,
-                'category' => 'Computer',
+                'name' => 'Computer',
                 'brand' => 'HP',
             ],
         ];

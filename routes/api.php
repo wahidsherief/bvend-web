@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\api\ProductController;
+use App\Http\Controllers\api\ProductCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,17 +23,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('product')->group(function () {
-    /** product  routes */
-    Route::get('/', [ProductController::class, 'index']);
-    Route::post('/', [ProductController::class, 'store']);
-    Route::put('/update/{id}', [ProductController::class, 'update']);
-    Route::delete('/delete/{id}', [ProductController::class, 'delete']);
-
-    /** product category routes */
-    Route::prefix('category')->group(function () {
-        Route::get('/', [ProductCategoryController::class, 'index']);
-        Route::post('/', [ProductCategoryController::class, 'store']);
-        Route::put('/update/{id}', [ProductCategoryController::class, 'update']);
-        Route::delete('/delete/{id}', [ProductCategoryController::class, 'delete']);
-    });
+    Route::apiResource('category', ProductCategoryController::class);
 });
+
+
+Route::apiResource('product/', ProductController::class);
