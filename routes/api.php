@@ -22,9 +22,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
+
 Route::prefix('product')->group(function () {
+    Route::apiResource('/', ProductController::class);
     Route::apiResource('category', ProductCategoryController::class);
 });
 
 
-Route::apiResource('product/', ProductController::class);
+
+// Route::put('product/{id}', [ProductController::class, 'update']);
+// Route::delete('product/{id}', [ProductController::class, 'destroy']);
