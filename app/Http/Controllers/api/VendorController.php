@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductCategoryResource;
-use App\Models\ProductCategory;
+use App\Http\Resources\VendorResource;
+use App\Models\Vendor;
 use App\Services\BaseServices;
 use Illuminate\Http\Request;
 
-class ProductCategoryController extends Controller
+class VendorController extends Controller
 {
     protected $service;
-    protected $product_category;
+    protected $vendor;
 
-    public function __construct(BaseServices $service, ProductCategory $product_category)
+    public function __construct(BaseServices $service, Vendor $vendor)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->product_category = $product_category;
+        $this->vendor = $vendor;
     }
 
     /**
@@ -27,7 +27,8 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        return ProductCategoryResource::collection($this->product_category->all())->response(200);
+        // return VendorResource::collection($this->vendor->with('category')->get())->response(200);
+        return VendorResource::collection($this->vendor->all())->response(200);
     }
 
     /**
@@ -38,8 +39,8 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->product_category->create($request->all());
-        return response(new ProductCategoryResource($stored), 201);
+        $stored = $this->vendor->create($request->all());
+        return response(new VendorResource($stored), 201);
     }
 
     /**
@@ -62,8 +63,8 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->product_category->find($id))->update($request->all());
-        return response(new ProductCategoryResource($updated), 201);
+        $updated = tap($this->vendor->find($id))->update($request->all());
+        return response(new VendorResource($updated), 201);
     }
 
     /**
@@ -74,7 +75,7 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $this->product_category->find($id)->delete();
+        $this->vendor->find($id)->delete();
         return response('success', 204);
     }
 }

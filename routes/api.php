@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ProductCategoryController;
+use App\Http\Controllers\api\VendorController;
+use App\Http\Controllers\api\MachineController;
+use App\Http\Controllers\api\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,11 +27,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('product')->group(function () {
-    Route::apiResource('/', ProductController::class);
     Route::apiResource('category', ProductCategoryController::class);
+    // this route should put at the bottom of other routes
+    Route::apiResource('/', ProductController::class)->parameters(['' => 'product']);
+});
+
+Route::prefix('vendor')->group(function () {
+    // this route should put at the bottom of other routes
+    Route::apiResource('/', VendorController::class)->parameters(['' => 'vendor']);
 });
 
 
+Route::prefix('machine')->group(function () {
+    // this route should put at the bottom of other routes
+    Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
+});
 
-// Route::put('product/{id}', [ProductController::class, 'update']);
-// Route::delete('product/{id}', [ProductController::class, 'destroy']);
+Route::apiResource('transaction/', TransactionController::class);

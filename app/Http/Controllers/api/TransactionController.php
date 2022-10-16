@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
-use App\Models\Product;
+use App\Http\Resources\TransactionResource;
+use App\Models\Transaction;
 use App\Services\BaseServices;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class TransactionController extends Controller
 {
-    public function __construct(BaseServices $service, Product $product)
+    protected $service;
+    protected $transaction;
+
+    public function __construct(BaseServices $service, Transaction $transaction)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->product = $product;
+        $this->transaction = $transaction;
     }
 
     /**
@@ -24,7 +27,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection($this->product->with('category')->get())->response(200);
+        return TransactionResource::collection($this->transaction->all())->response(200);
     }
 
     /**
@@ -35,8 +38,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->product->create($request->all());
-        return response(new ProductResource($stored), 201);
+        $stored = $this->transaction->create($request->all());
+        return response(new TransactionResource($stored), 201);
     }
 
     /**
@@ -51,19 +54,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $updated = tap($this->product->find($id))->update($request->all());
-        return response(new ProductResource($updated), 201);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
@@ -71,7 +61,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $this->product->find($id)->delete();
-        return response('success', 204);
+        // $this->transaction->find($id)->delete();
+        // return response('success', 204);
     }
 }

@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductCategoryResource;
-use App\Models\ProductCategory;
+use App\Http\Resources\MachineResource;
+use App\Models\Machine;
 use App\Services\BaseServices;
 use Illuminate\Http\Request;
 
-class ProductCategoryController extends Controller
+class MachineController extends Controller
 {
     protected $service;
-    protected $product_category;
+    protected $machine;
 
-    public function __construct(BaseServices $service, ProductCategory $product_category)
+    public function __construct(BaseServices $service, Machine $machine)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->product_category = $product_category;
+        $this->machine = $machine;
     }
 
     /**
@@ -27,7 +27,7 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        return ProductCategoryResource::collection($this->product_category->all())->response(200);
+        return MachineResource::collection($this->machine->all())->response(200);
     }
 
     /**
@@ -38,8 +38,8 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->product_category->create($request->all());
-        return response(new ProductCategoryResource($stored), 201);
+        $stored = $this->machine->create($request->all());
+        return response(new MachineResource($stored), 201);
     }
 
     /**
@@ -62,8 +62,8 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->product_category->find($id))->update($request->all());
-        return response(new ProductCategoryResource($updated), 201);
+        $updated = tap($this->machine->find($id))->update($request->all());
+        return response(new MachineResource($updated), 201);
     }
 
     /**
@@ -74,7 +74,7 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $this->product_category->find($id)->delete();
+        $this->machine->find($id)->delete();
         return response('success', 204);
     }
 }
