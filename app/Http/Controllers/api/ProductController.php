@@ -5,12 +5,14 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Services\BaseServices;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function __construct(BaseServices $service, Product $product)
+    private $path = 'product';
+
+    public function __construct(BaseService $service, Product $product)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
@@ -35,6 +37,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $attributes = $this->service->processInputForStore($request->all(), $this->path);
+        dd($attributes);
         $stored = $this->product->create($request->all());
         return response(new ProductResource($stored), 201);
     }
