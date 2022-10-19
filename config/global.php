@@ -10,7 +10,7 @@ $api_url_bkash = $api_url . 'bkash/';
 return [
     'api_url' => $api_url,
     'api_url_bkash' => $api_url_bkash,
-    'bkash_url' => $bkash_url,
+    // 'bkash_url' => $bkash_url,
 
     'product_image_path' => $product_image_path,
     'vendor_image_path' => $vendor_image_path,

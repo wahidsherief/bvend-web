@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MachineResource;
 use App\Models\Machine;
-use App\Services\BaseServices;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
 
 class MachineController extends Controller
@@ -13,7 +13,7 @@ class MachineController extends Controller
     protected $service;
     protected $machine;
 
-    public function __construct(BaseServices $service, Machine $machine)
+    public function __construct(BaseService $service, Machine $machine)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
-use App\Services\BaseServices;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -13,7 +13,7 @@ class TransactionController extends Controller
     protected $service;
     protected $transaction;
 
-    public function __construct(BaseServices $service, Transaction $transaction)
+    public function __construct(BaseService $service, Transaction $transaction)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;

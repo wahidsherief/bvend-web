@@ -37,10 +37,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $attributes = $this->service->processInputForStore($request->all(), $this->path);
-        dd($attributes);
+        return request()->file('image');
+        return $request->image = $request->has('image') && $this->service->uploadImage($request->file('image'), $this->path);
+        return $request->all();
         $stored = $this->product->create($request->all());
-        return response(new ProductResource($stored), 201);
+        if ($stored) {
+            return $this->index();
+        }
     }
 
     /**
@@ -63,8 +66,12 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->product->find($id))->update($request->all());
-        return response(new ProductResource($updated), 201);
+        // $updated = tap($this->product->find($id))->update($request->all());
+        $updated = $this->product->find($id)->update($request->all());
+        if ($updated) {
+            return $this->index();
+        }
+        // return response(new ProductResource($updated), 201);
     }
 
     /**
@@ -75,7 +82,9 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $this->product->find($id)->delete();
-        return response('success', 204);
+        $destroyed = $this->product->find($id)->delete();
+        if ($destroyed) {
+            return $this->index();
+        }
     }
 }

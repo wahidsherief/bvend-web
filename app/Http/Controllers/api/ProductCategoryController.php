@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCategoryResource;
 use App\Models\ProductCategory;
-use App\Services\BaseServices;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
 
 class ProductCategoryController extends Controller
@@ -13,7 +13,7 @@ class ProductCategoryController extends Controller
     protected $service;
     protected $product_category;
 
-    public function __construct(BaseServices $service, ProductCategory $product_category)
+    public function __construct(BaseService $service, ProductCategory $product_category)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
@@ -39,7 +39,9 @@ class ProductCategoryController extends Controller
     public function store(Request $request)
     {
         $stored = $this->product_category->create($request->all());
-        return response(new ProductCategoryResource($stored), 201);
+        if ($stored) {
+            return $this->index();
+        }
     }
 
     /**
@@ -63,7 +65,9 @@ class ProductCategoryController extends Controller
     public function update(Request $request, $id)
     {
         $updated = tap($this->product_category->find($id))->update($request->all());
-        return response(new ProductCategoryResource($updated), 201);
+        if ($updated) {
+            return $this->index();
+        }
     }
 
     /**
@@ -74,7 +78,9 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $this->product_category->find($id)->delete();
-        return response('success', 204);
+        $destroyed = $this->product_category->find($id)->delete();
+        if ($destroyed) {
+            return $this->index();
+        }
     }
 }

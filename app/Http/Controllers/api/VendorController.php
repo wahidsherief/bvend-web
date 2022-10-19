@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\VendorResource;
 use App\Models\Vendor;
-use App\Services\BaseServices;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
 
 class VendorController extends Controller
@@ -13,7 +13,7 @@ class VendorController extends Controller
     protected $service;
     protected $vendor;
 
-    public function __construct(BaseServices $service, Vendor $vendor)
+    public function __construct(BaseService $service, Vendor $vendor)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
