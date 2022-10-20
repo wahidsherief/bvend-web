@@ -37,10 +37,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        return request()->file('image');
-        return $request->image = $request->has('image') && $this->service->uploadImage($request->file('image'), $this->path);
-        return $request->all();
-        $stored = $this->product->create($request->all());
+        $data = $request->all();
+
+        if ($request->has('image')) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        $stored = $this->product->create($data);
         if ($stored) {
             return $this->index();
         }

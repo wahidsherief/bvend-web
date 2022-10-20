@@ -16,10 +16,10 @@ class BaseService
     {
         $path = config('global.' . $image_path . '_image_path');
 
-        file_exists($image) && unlink($image);
+        $image_name = 'bvend-' . $image_path . '-' . time() . '.' . $image->getClientOriginalExtension();
 
-        $image_name = 'bvend-' . $image_path . '-' . $image->name . '-' . time() . '.' . $image->getClientOriginalExtension();
         $image->move($path, $image_name);
+
         return $image_name;
     }
 
