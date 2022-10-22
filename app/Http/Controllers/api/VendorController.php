@@ -10,8 +10,7 @@ use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
-    protected $service;
-    protected $vendor;
+    private $path = 'vendor';
 
     public function __construct(BaseService $service, Vendor $vendor)
     {
@@ -39,8 +38,18 @@ class VendorController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->vendor->create($request->all());
-        return response(new VendorResource($stored), 201);
+        $data = $request->all();
+
+        if ($request->has('image')) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        $data['is_active'] = $request->is_active === true ? 1 : 0;
+
+        $stored = $this->vendor->create($data);
+        if ($stored) {
+            return $this->index();
+        }
     }
 
     /**
@@ -63,8 +72,22 @@ class VendorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->vendor->find($id))->update($request->all());
-        return response(new VendorResource($updated), 201);
+        return $data = $request->all();
+
+        return $request->file('image');
+
+        if ($request->has('image')) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        return $data['image'];
+
+        $data['is_active'] = $request->is_active === true ? 1 : 0;
+
+        $updated = $this->vendor->find($id)->update($request->all());
+        if ($updated) {
+            return $this->index();
+        }
     }
 
     /**
@@ -75,7 +98,9 @@ class VendorController extends Controller
      */
     public function destroy($id)
     {
-        $this->vendor->find($id)->delete();
-        return response('success', 204);
+        $destroyed = $this->vendor->find($id)->delete();
+        if ($destroyed) {
+            return $this->index();
+        }
     }
 }

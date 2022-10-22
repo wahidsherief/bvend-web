@@ -14,6 +14,10 @@ class VendorResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $data = parent::toArray($request);
+
+        $data['is_active'] = $data['is_active'] === 0 ? false : true;
+
+        return $data;
     }
 }

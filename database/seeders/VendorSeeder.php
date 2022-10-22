@@ -28,15 +28,15 @@ class VendorSeeder extends Seeder
         foreach ($items as $key=>$item) {
             $vendor = new Vendor();
             $vendor->name = "Vendor ". $key;
-            $vendor->phone = "01825645569";
+            $vendor->contact = "01825645569";
             $vendor->image = "vendor image";
             $vendor->email = "vendor_".$key."@bvend.com";
             $vendor->password = "123456";
             $vendor->business_name = $item;
-            $vendor->additional_phone = '01564589785';
+            $vendor->additional_contact = '01564589785';
             $vendor->trade_licence_no = $key.'-1234';
-            $vendor->bank_account_no = $key.'-5678';
             $vendor->nid = $key.'-4321';
+            $vendor->is_active = 0;
             $vendor->save();
         }
     }

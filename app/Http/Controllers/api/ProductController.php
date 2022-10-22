@@ -69,12 +69,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $updated = tap($this->product->find($id))->update($request->all());
         $updated = $this->product->find($id)->update($request->all());
         if ($updated) {
             return $this->index();
         }
-        // return response(new ProductResource($updated), 201);
     }
 
     /**

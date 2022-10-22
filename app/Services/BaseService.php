@@ -16,6 +16,9 @@ class BaseService
     {
         $path = config('global.' . $image_path . '_image_path');
 
+        return 'da' . $image;
+        // return $image;
+
         $image_name = 'bvend-' . $image_path . '-' . time() . '.' . $image->getClientOriginalExtension();
 
         $image->move($path, $image_name);
