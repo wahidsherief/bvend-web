@@ -72,19 +72,15 @@ class VendorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return $data = $request->all();
-
-        return $request->file('image');
+        $data = $request->all();
 
         if ($request->has('image')) {
             $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
         }
 
-        return $data['image'];
-
         $data['is_active'] = $request->is_active === true ? 1 : 0;
 
-        $updated = $this->vendor->find($id)->update($request->all());
+        $updated = $this->vendor->find($id)->update($data);
         if ($updated) {
             return $this->index();
         }
