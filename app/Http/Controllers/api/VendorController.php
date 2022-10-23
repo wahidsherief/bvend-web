@@ -74,11 +74,11 @@ class VendorController extends Controller
     {
         $data = $request->all();
 
-        if ($request->has('image')) {
+        if ($request->has('image') && strlen($request->file('image')) > 0) {
             $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
         }
 
-        $data['is_active'] = $request->is_active === true ? 1 : 0;
+        $data['is_active'] = $request->is_active == 'false' ? 0 : 1;
 
         $updated = $this->vendor->find($id)->update($data);
         if ($updated) {
