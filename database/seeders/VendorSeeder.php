@@ -29,7 +29,7 @@ class VendorSeeder extends Seeder
             $vendor = new Vendor();
             $vendor->name = "Vendor ". $key;
             $vendor->contact = "01825645569";
-            $vendor->image = "vendor image";
+            $vendor->image = "avatar.jpg";
             $vendor->email = "vendor_".$key."@bvend.com";
             $vendor->password = "123456";
             $vendor->business_name = $item;

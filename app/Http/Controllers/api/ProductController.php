@@ -71,7 +71,7 @@ class ProductController extends Controller
     {
         $data = $request->all();
 
-        if ($request->has('image')) {
+        if ($request->has('image') && strlen($request->file('image')) > 0) {
             $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
         }
 
