@@ -69,7 +69,13 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = $this->product->find($id)->update($request->all());
+        $data = $request->all();
+
+        if ($request->has('image')) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        $updated = $this->product->find($id)->update($data);
         if ($updated) {
             return $this->index();
         }
