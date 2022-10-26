@@ -7,6 +7,7 @@ use App\Http\Resources\MachineResource;
 use App\Models\Machine;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MachineController extends Controller
 {
@@ -38,8 +39,18 @@ class MachineController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->machine->create($request->all());
-        return response(new MachineResource($stored), 201);
+        $data = $request->all();
+
+        $machine_code = mt_rand(100000, 999999);
+
+        $qr_code =  $this->generateQRCode($machine_code, $request->machine_type);
+
+        if (strlen($qr_code) > 0) {
+            $data['machine_code'] = $machine_code;
+            $data['qr_code'] = $qr_code;
+            $data['is_active'] = $request->is_active === true ? 1 : 0;
+            return $this->machine->create($data) && $this->index();
+        }
     }
 
     /**
@@ -76,5 +87,24 @@ class MachineController extends Controller
     {
         $this->machine->find($id)->delete();
         return response('success', 204);
+    }
+
+    private function generateQRCode($machine_code, $type)
+    {
+        $path = config('global.qrcode_image_path');
+        try {
+            $code = 'BVENDMACHINECODE-' . $machine_code;
+            $qr_code = $type . '-' . $machine_code . '.png';
+            $url = $path . $qr_code;
+            QrCode::format('png')
+                ->margin(0)
+                ->size(500)
+                ->generate($code, $url);
+
+            return $qr_code;
+        } catch (\Exception $e) {
+            report($e);
+            return false;
+        }
     }
 }

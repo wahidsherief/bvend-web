@@ -24,10 +24,8 @@ class MachineSeeder extends Seeder
             $machine->no_of_rows = 10;
             $machine->no_of_trays = 6;
             $machine->locks_per_tray = 10;
-            $machine->qr_code = 'xxx';
-            $machine->address = 'dummy address';
-            $machine->maintainance = 0;
-            $machine->active = 1;
+            $machine->qr_code = 'avatar.jpg';
+            $machine->is_active = 0;
             $machine->save();
         }
     }

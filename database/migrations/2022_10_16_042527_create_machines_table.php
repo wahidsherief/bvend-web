@@ -20,9 +20,7 @@ return new class () extends Migration {
             $table->integer('no_of_trays');
             $table->integer('locks_per_tray');
             $table->string('qr_code');
-            $table->text('address');
-            $table->boolean('maintainance')->default(0);
-            $table->boolean('active')->default(0);
+            $table->boolean('is_active')->default(0);
             $table->timestamps();
         });
     }
