@@ -11,4 +11,9 @@ class Vendor extends Model
 
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
+
+    public function vendorMachine()
+    {
+        return $this->hasOne('App\Models\VendorMachine', 'vendors_id', 'id');
+    }
 }

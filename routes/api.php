@@ -41,6 +41,7 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('machine')->group(function () {
     // this route should put at the bottom of other routes
     Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
+    Route::post('/assign', [MachineController::class, 'assign']);
 });
 
 Route::apiResource('transaction/', TransactionController::class);

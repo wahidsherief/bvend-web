@@ -8,6 +8,7 @@ use App\Models\Machine;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class MachineController extends Controller
 {
@@ -28,7 +29,8 @@ class MachineController extends Controller
      */
     public function index()
     {
-        return MachineResource::collection($this->machine->all())->response(200);
+        return MachineResource::collection($this->machine->with('vendor')->get())->response(200);
+        // return MachineResource::collection($this->machine->with('vendor'))->response(200);
     }
 
     /**
@@ -89,6 +91,11 @@ class MachineController extends Controller
         return response('success', 204);
     }
 
+    public function assign(Request $request)
+    {
+        DB::table('vendor_machines')->insert($request->all());
+    }
+
     private function generateQRCode($machine_code, $type)
     {
         $path = config('global.qrcode_image_path');
@@ -106,5 +113,14 @@ class MachineController extends Controller
             report($e);
             return false;
         }
+    }
+
+    private function getMachines()
+    {
+        return DB::table('machines')
+        ->select('machines.*', 'vendors.id', 'vendors.name')
+        ->join('vendor_machines', 'machines_id', '=', 'machines.id')
+        ->join('vendors', 'vendors_id', '=', 'vendors.id')
+        ->get();
     }
 }

@@ -11,4 +11,9 @@ class Machine extends Model
 
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
+
+    public function vendor()
+    {
+        return $this->belongsTo('App\Models\Vendor', 'vendors_id', 'id');
+    }
 }
