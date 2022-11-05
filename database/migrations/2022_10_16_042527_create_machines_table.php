@@ -20,8 +20,9 @@ return new class () extends Migration {
             $table->integer('no_of_trays');
             $table->integer('locks_per_tray');
             $table->string('qr_code');
-            $table->integer('vendors_id')->unique()->nullable();
+            $table->integer('vendors_id')->nullable();
             $table->string('assign_date')->nullable();
+            $table->string('location')->nullable();
             $table->boolean('is_active')->default(0);
             $table->timestamps();
         });

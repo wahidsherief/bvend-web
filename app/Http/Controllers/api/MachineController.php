@@ -30,7 +30,6 @@ class MachineController extends Controller
     public function index()
     {
         return MachineResource::collection($this->machine->with('vendor')->get())->response(200);
-        // return MachineResource::collection($this->machine->with('vendor'))->response(200);
     }
 
     /**
@@ -75,8 +74,12 @@ class MachineController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->machine->find($id))->update($request->all());
-        return response(new MachineResource($updated), 201);
+        $data = $request->all();
+        $data['is_active'] = $request->is_active === true ? 1 : 0;
+        $updated = $this->machine->find($id)->update($data);
+        if ($updated) {
+            return $this->index();
+        }
     }
 
     /**
@@ -89,11 +92,6 @@ class MachineController extends Controller
     {
         $this->machine->find($id)->delete();
         return response('success', 204);
-    }
-
-    public function assign(Request $request)
-    {
-        DB::table('vendor_machines')->insert($request->all());
     }
 
     private function generateQRCode($machine_code, $type)
@@ -113,14 +111,5 @@ class MachineController extends Controller
             report($e);
             return false;
         }
-    }
-
-    private function getMachines()
-    {
-        return DB::table('machines')
-        ->select('machines.*', 'vendors.id', 'vendors.name')
-        ->join('vendor_machines', 'machines_id', '=', 'machines.id')
-        ->join('vendors', 'vendors_id', '=', 'vendors.id')
-        ->get();
     }
 }

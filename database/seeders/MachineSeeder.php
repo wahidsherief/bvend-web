@@ -25,6 +25,9 @@ class MachineSeeder extends Seeder
             $machine->no_of_trays = 6;
             $machine->locks_per_tray = 10;
             $machine->qr_code = 'avatar.jpg';
+            $machine->vendors_id = $i+1;
+            $machine->assign_date = '';
+            $machine->location = '';
             $machine->is_active = 0;
             $machine->save();
         }

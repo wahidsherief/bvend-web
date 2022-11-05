@@ -8,6 +8,7 @@ use App\Http\Controllers\api\ProductCategoryController;
 use App\Http\Controllers\api\VendorController;
 use App\Http\Controllers\api\MachineController;
 use App\Http\Controllers\api\TransactionController;
+use App\Http\Controllers\api\VendorMachineController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
+Route::get('vendor/machines/{id}', [VendorMachineController::class, 'index']);
+Route::get('vendor/machine/refills/{id}', [VendorMachineController::class, 'getRefills']);
 
 Route::prefix('product')->group(function () {
     Route::apiResource('category', ProductCategoryController::class);
@@ -41,7 +44,7 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('machine')->group(function () {
     // this route should put at the bottom of other routes
     Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
-    Route::post('/assign', [MachineController::class, 'assign']);
+    // Route::post('/assign', [MachineController::class, 'assign']);
 });
 
 Route::apiResource('transaction/', TransactionController::class);

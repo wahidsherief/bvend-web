@@ -26,5 +26,6 @@ class DatabaseSeeder extends Seeder
         $this->call(VendorSeeder::class);
         $this->call(MachineSeeder::class);
         $this->call(TransactionSeeder::class);
+        $this->call(RefillSeeder::class);
     }
 }
