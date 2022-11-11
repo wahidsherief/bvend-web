@@ -12,8 +12,8 @@ class Refill extends Model
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
 
-    // public function vendorMachine()
-    // {
-    //     return $this->hasOne('App\Models\VendorMachine', 'vendors_id', 'id');
-    // }
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product', 'products_id', 'id');
+    }
 }

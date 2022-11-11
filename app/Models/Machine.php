@@ -16,4 +16,9 @@ class Machine extends Model
     {
         return $this->belongsTo('App\Models\Vendor', 'vendors_id', 'id');
     }
+
+    public function refills()
+    {
+        return $this->hasMany('App\Models\Refill', 'machines_id', 'id');
+    }
 }

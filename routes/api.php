@@ -27,7 +27,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('vendor/machines/{id}', [VendorMachineController::class, 'index']);
-Route::get('vendor/machine/refills/{id}', [VendorMachineController::class, 'getRefills']);
+Route::get('vendor/machine/refill/{id}', [VendorMachineController::class, 'getRefills']);
+Route::post('vendor/machine/refill/', [VendorMachineController::class, 'storeRefill']);
 
 Route::prefix('product')->group(function () {
     Route::apiResource('category', ProductCategoryController::class);
