@@ -9,6 +9,7 @@ use App\Http\Controllers\api\VendorController;
 use App\Http\Controllers\api\MachineController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\VendorMachineController;
+use App\Http\Controllers\api\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('vendor/machines/{id}', [VendorMachineController::class, 'index']);
 Route::get('vendor/machine/refill/{id}', [VendorMachineController::class, 'getRefills']);
 Route::post('vendor/machine/refill/', [VendorMachineController::class, 'storeRefill']);
+
+Route::post('bkash', [PaymentController::class, 'bkashWebhook']);
 
 Route::prefix('product')->group(function () {
     Route::apiResource('category', ProductCategoryController::class);

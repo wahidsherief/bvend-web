@@ -8,6 +8,16 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     /**
+     * The Artisan commands provided by your application.
+     *
+     * @var array
+     */
+    protected $commands = [
+        Commands\SubscribeFromMachine::class,
+        Commands\PublishToMachine::class
+    ];
+
+    /**
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
@@ -15,7 +25,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // $schedule->call(function () {
+        //     Log::info('working...');
+        // })->everyMinute();
+
+        // schedule command is disabled in live server
+        // which generates texts.
+        $schedule->command('subscribe:machine')->everyMinute();
+        $schedule->command('publish:machine')->everyMinute();
     }
 
     /**
@@ -25,7 +42,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
