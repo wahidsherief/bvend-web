@@ -201,7 +201,7 @@ return [
          */
         Barryvdh\Debugbar\ServiceProvider::class,
         // SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-
+        Salman\Mqtt\MqttServiceProvider::class,
     ],
 
     /*
@@ -217,7 +217,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        // 'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class
+        // 'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+        'Mqtt' => \Salman\Mqtt\Facades\Mqtt::class
     ])->toArray(),
 
 ];
