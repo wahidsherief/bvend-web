@@ -26,28 +26,6 @@ class MqttService
         return $params;
     }
 
-    private function message($params)
-    {
-        return json_encode(["c" => $params['c'],"f" => $params['f'],"t" => $params['t'],"m" => $params['m'],"s" => $params['s'], "e" => $params['e']]);
-    }
-
-    private function getMessageFormat($request)
-    {
-        if (isset($request->no_of_products, $request->channel_number)) {
-            return $request->no_of_products .'&'. $request->channel_number;
-        } elseif (isset($request->server_health_status)) {
-            return $request->server_health_status;
-        } elseif (isset($request->run_time)) {
-            return $request->run_time;
-        } elseif (isset($request->lighting_on_time)) {
-            return $request->lighting_on_time;
-        } elseif (isset($request->current_clock_time)) {
-            return $request->current_clock_time;
-        } else {
-            return '0';
-        }
-    }
-
     public function publish($params)
     {
         $topic = '1000/'.$params['machine_number'];
@@ -70,5 +48,34 @@ class MqttService
 
             return $message;
         }, $packet_id);
+    }
+
+    private function message($params)
+    {
+        return json_encode([
+            "c" => $params['c'],
+            "f" => $params['f'],
+            "t" => $params['t'],
+            "m" => $params['m'],
+            "s" => $params['s'], 
+            "e" => $params['e']
+        ]);
+    }
+
+    private function getMessageFormat($request)
+    {
+        if (isset($request->no_of_products, $request->channel_number)) {
+            return $request->no_of_products .'&'. $request->channel_number;
+        } elseif (isset($request->server_health_status)) {
+            return $request->server_health_status;
+        } elseif (isset($request->run_time)) {
+            return $request->run_time;
+        } elseif (isset($request->lighting_on_time)) {
+            return $request->lighting_on_time;
+        } elseif (isset($request->current_clock_time)) {
+            return $request->current_clock_time;
+        } else {
+            return '0';
+        }
     }
 }

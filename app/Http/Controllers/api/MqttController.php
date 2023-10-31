@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
+
+use App\Http\Controllers\Controller;
 
 use Mqtt;
 
 class MqttController extends Controller
 {
-    public function PublishTopic()
+    public function publishTopic()
     {
         $c = "3";
         $f = "1000001";
@@ -14,7 +16,7 @@ class MqttController extends Controller
         $m = "6:00-24:00";
         $s = "EDAF8EB5D1DE1E5AF233EEF20BDDAB11";
         $k = "2";
-        $e = md5($f+$t+$s+$m+$k);
+        $e = md5($f . $t . $s . $m . $k);
 
         $topic = 'bvend/1000/1';
         

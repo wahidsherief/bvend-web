@@ -65,8 +65,6 @@ class PaymentController extends Controller
         }
     }
 
-
-
     private function getTransactionData($notificationData)
     {
         return [

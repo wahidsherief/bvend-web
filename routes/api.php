@@ -11,6 +11,8 @@ use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\VendorMachineController;
 use App\Http\Controllers\api\PaymentController;
 
+use App\Http\Controllers\api\MqttController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +23,12 @@ use App\Http\Controllers\api\PaymentController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+/** test routes -- start */
+
+Route::get('mqtt/publish', [MqttController::class, 'publishTopic']);
+
+/** test routes -- end */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
