@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MachineResource;
 use Illuminate\Http\Request;
 use App\Models\Machine;
 use App\Models\Refill;
@@ -19,13 +18,14 @@ class VendorMachineController extends Controller
     public function index($id)
     {
         $machines = Machine::where('vendors_id', $id)->withSum('refills', 'price')->withSum('refills', 'quantity')->get();
-        return MachineResource::collection($machines)->response(200);
+        return response()->json($machines, 200);
+        
     }
 
     public function getRefills($id)
     {
         $refills = Refill::where('machines_id', $id)->with('product')->get();
-        return MachineResource::collection($refills)->response(200);
+        return response()->json($refills, 200);
     }
 
     public function storeRefill(Request $request)

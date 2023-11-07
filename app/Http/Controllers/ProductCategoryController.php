@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\VendorResource;
-use App\Models\Vendor;
+use App\Models\ProductCategory;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 
-class VendorController extends Controller
+class ProductCategoryController extends Controller
 {
-    private $path = 'vendor';
+    protected $service;
+    protected $product_category;
 
-    public function __construct(BaseService $service, Vendor $vendor)
+    public function __construct(BaseService $service, ProductCategory $product_category)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->vendor = $vendor;
+        $this->product_category = $product_category;
     }
 
     /**
@@ -26,8 +26,7 @@ class VendorController extends Controller
      */
     public function index()
     {
-        // return VendorResource::collection($this->vendor->with('category')->get())->response(200);
-        return VendorResource::collection($this->vendor->all())->response(200);
+        return response()->json($this->product_category->all(), 200);
     }
 
     /**
@@ -38,15 +37,7 @@ class VendorController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
-
-        if ($request->has('image')) {
-            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
-        }
-
-        $data['is_active'] = $request->is_active === true ? 1 : 0;
-
-        $stored = $this->vendor->create($data);
+        $stored = $this->product_category->create($request->all());
         if ($stored) {
             return $this->index();
         }
@@ -72,15 +63,7 @@ class VendorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->all();
-
-        if ($request->has('image') && strlen($request->file('image')) > 0) {
-            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
-        }
-
-        $data['is_active'] = $request->is_active == 'false' ? 0 : 1;
-
-        $updated = $this->vendor->find($id)->update($data);
+        $updated = tap($this->product_category->find($id))->update($request->all());
         if ($updated) {
             return $this->index();
         }
@@ -94,7 +77,7 @@ class VendorController extends Controller
      */
     public function destroy($id)
     {
-        $destroyed = $this->vendor->find($id)->delete();
+        $destroyed = $this->product_category->find($id)->delete();
         if ($destroyed) {
             return $this->index();
         }

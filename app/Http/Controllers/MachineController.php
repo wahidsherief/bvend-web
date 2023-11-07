@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MachineResource;
 use App\Models\Machine;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
@@ -29,7 +28,7 @@ class MachineController extends Controller
      */
     public function index()
     {
-        return MachineResource::collection($this->machine->with('vendor')->get())->response(200);
+        return response()->json($this->machine->with('vendor')->get(), 200);
     }
 
     /**

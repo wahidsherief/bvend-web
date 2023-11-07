@@ -202,6 +202,7 @@ return [
         Barryvdh\Debugbar\ServiceProvider::class,
         // SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
         Salman\Mqtt\MqttServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*
@@ -218,7 +219,9 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         // 'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
-        'Mqtt' => \Salman\Mqtt\Facades\Mqtt::class
+        'Mqtt' => \Salman\Mqtt\Facades\Mqtt::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ])->toArray(),
 
 ];

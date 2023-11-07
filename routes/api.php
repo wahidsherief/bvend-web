@@ -3,15 +3,17 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\api\ProductController;
-use App\Http\Controllers\api\ProductCategoryController;
-use App\Http\Controllers\api\VendorController;
-use App\Http\Controllers\api\MachineController;
-use App\Http\Controllers\api\TransactionController;
-use App\Http\Controllers\api\VendorMachineController;
-use App\Http\Controllers\api\PaymentController;
-
-use App\Http\Controllers\api\MqttController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\MachineController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\VendorMachineController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MqttController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,10 +32,61 @@ Route::get('mqtt/publish', [MqttController::class, 'publishTopic']);
 
 /** test routes -- end */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+/** Auth routes -- starts */
+
+// auth - user
+Route::group(['prefix' => 'user'], function ($router) {
+    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/register', [UserController::class, 'register']);
 });
 
+Route::group(['middleware' => ['jwt.role:user', 'jwt.auth'], 'prefix' => 'user'], function ($router) {
+    Route::post('/logout', [UserController::class, 'logout']);
+    Route::get('/', [UserController::class, 'profile']);
+});
+
+// auth - admin
+Route::group(['prefix' => 'admin'], function ($router) {
+    Route::post('/register', [AdminController::class, 'register']);
+    Route::post('/login', [AdminController::class, 'login']);
+});
+
+Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin'], function ($router) {
+    Route::post('/logout', [AdminController::class, 'logout']);
+    Route::get('/', [AdminController::class, 'profile']);
+    
+});
+
+// auth - staff
+Route::group(['prefix' => 'staff'], function ($router) {
+    Route::post('/login', [StaffController::class, 'login']);
+    Route::post('/register', [StaffController::class, 'register']);
+});
+
+Route::group(['middleware' => ['jwt.role:staff', 'jwt.auth'], 'prefix' => 'staff'], function ($router) {
+    Route::post('/logout', [StaffController::class, 'logout']);
+    Route::get('/', [StaffController::class, 'profile']);
+    
+});
+
+// auth - vendor
+Route::group(['prefix' => 'vendor'], function ($router) {
+    Route::post('/login', [VendorController::class, 'login']);
+    Route::post('/register', [VendorController::class, 'register']);
+});
+
+Route::group(['middleware' => ['jwt.role:vendor', 'jwt.auth'], 'prefix' => 'vendor'], function ($router) {
+    Route::post('/logout', [VendorController::class, 'logout']);
+    Route::get('/', [VendorController::class, 'profile']);
+    
+});
+
+/** Auth routes -- ends */
 
 Route::get('vendor/machines/{id}', [VendorMachineController::class, 'index']);
 Route::get('vendor/machine/refill/{id}', [VendorMachineController::class, 'getRefills']);
@@ -56,7 +109,6 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('machine')->group(function () {
     // this route should put at the bottom of other routes
     Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
-    // Route::post('/assign', [MachineController::class, 'assign']);
 });
 
 Route::apiResource('transaction/', TransactionController::class);

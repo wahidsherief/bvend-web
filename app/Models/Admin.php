@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Vendor extends Authenticatable implements JWTSubject
+class Admin extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
@@ -18,20 +18,11 @@ class Vendor extends Authenticatable implements JWTSubject
 
     protected $cast = [ 'email_verified_at' => 'datetime'];
 
-    protected $primaryKey = 'id';
-    protected $guarded = ['id'];
-
     public function getJWTIdentifier () {
         return $this->getKey();
     } 
 
     public function getJWTCustomClaims () {
-        return ['role' => 'vendor'];
+        return ['role' => 'admin'];
     } 
-
-    public function vendorMachine()
-    {
-        return $this->hasOne('App\Models\VendorMachine', 'vendors_id', 'id');
-    }
-    
 }

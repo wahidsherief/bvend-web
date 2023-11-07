@@ -1,23 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductCategoryResource;
-use App\Models\ProductCategory;
+use App\Models\Product;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 
-class ProductCategoryController extends Controller
+class ProductController extends Controller
 {
-    protected $service;
-    protected $product_category;
+    private $path = 'product';
 
-    public function __construct(BaseService $service, ProductCategory $product_category)
+    public function __construct(BaseService $service, Product $product)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->product_category = $product_category;
+        $this->product = $product;
     }
 
     /**
@@ -27,7 +25,7 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        return ProductCategoryResource::collection($this->product_category->all())->response(200);
+        return response()->json($this->product->with('category')->get(), 200);
     }
 
     /**
@@ -38,7 +36,13 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $stored = $this->product_category->create($request->all());
+        $data = $request->all();
+
+        if ($request->has('image')) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        $stored = $this->product->create($data);
         if ($stored) {
             return $this->index();
         }
@@ -64,7 +68,13 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updated = tap($this->product_category->find($id))->update($request->all());
+        $data = $request->all();
+
+        if ($request->has('image') && strlen($request->file('image')) > 0) {
+            $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
+        }
+
+        $updated = $this->product->find($id)->update($data);
         if ($updated) {
             return $this->index();
         }
@@ -78,7 +88,7 @@ class ProductCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $destroyed = $this->product_category->find($id)->delete();
+        $destroyed = $this->product->find($id)->delete();
         if ($destroyed) {
             return $this->index();
         }

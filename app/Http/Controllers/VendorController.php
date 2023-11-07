@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
-use App\Models\Product;
+use App\Models\Vendor;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class VendorController extends Controller
 {
-    private $path = 'product';
+    private $path = 'vendor';
 
-    public function __construct(BaseService $service, Product $product)
+    public function __construct(BaseService $service, Vendor $vendor)
     {
         // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->product = $product;
+        $this->vendor = $vendor;
     }
 
     /**
@@ -26,7 +25,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection($this->product->with('category')->get())->response(200);
+        return response()->json($this->vendor->all(), 200);
     }
 
     /**
@@ -43,7 +42,9 @@ class ProductController extends Controller
             $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
         }
 
-        $stored = $this->product->create($data);
+        $data['is_active'] = $request->is_active === true ? 1 : 0;
+
+        $stored = $this->vendor->create($data);
         if ($stored) {
             return $this->index();
         }
@@ -75,7 +76,9 @@ class ProductController extends Controller
             $data['image'] = $this->service->uploadImage($request->file('image'), $this->path);
         }
 
-        $updated = $this->product->find($id)->update($data);
+        $data['is_active'] = $request->is_active == 'false' ? 0 : 1;
+
+        $updated = $this->vendor->find($id)->update($data);
         if ($updated) {
             return $this->index();
         }
@@ -89,7 +92,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $destroyed = $this->product->find($id)->delete();
+        $destroyed = $this->vendor->find($id)->delete();
         if ($destroyed) {
             return $this->index();
         }
