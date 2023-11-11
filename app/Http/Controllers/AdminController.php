@@ -26,8 +26,7 @@ class AdminController extends Controller
     }
 
     public function logout() {
-        auth()->logout();
-        return response()->json(['message' => 'Logged out successfully']);
+        return $this->authService->logout();
     }
 
     public function profile() {

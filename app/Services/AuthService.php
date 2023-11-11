@@ -39,7 +39,7 @@ class AuthService
     }
 
     public function user() {
-        return response()->json(auth->user());
+        return response()->json(auth()->user(), 200);
     }
 
     private function createNewToken($token) {
