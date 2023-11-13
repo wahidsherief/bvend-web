@@ -16,7 +16,7 @@ return new class () extends Migration {
             $table->bigIncrements('id');
             $table->string('name');
             $table->integer('product_categories_id');
-            $table->string('unit')->nullable();
+            $table->string('brand')->nullable();
             $table->string('image');
             $table->boolean('active')->default(1);
             $table->timestamps();

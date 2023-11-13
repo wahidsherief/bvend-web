@@ -5,17 +5,39 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Services\BaseService;
-use Illuminate\Http\Request;
+use App\Services\AuthService;
+use App\Http\Requests\Login\LoginRequest;
+use App\Http\Requests\Registration\VendorRequest;
+
 
 class VendorController extends Controller
 {
+    protected $authService;
+
     private $path = 'vendor';
 
-    public function __construct(BaseService $service, Vendor $vendor)
+    public function __construct(AuthService $authService, BaseService $service, Vendor $vendor)
     {
-        // $this->middleware('auth:admin');
         $this->service = $service;
         $this->vendor = $vendor;
+        $this->authService = $authService;
+        \Config::set('auth.defaults.guard', 'vendor-api');
+    }
+
+    public function login(LoginRequest $request) {
+        return $this->authService->login($request);
+    }
+
+    public function register(VendorRequest $request) {
+        return $this->authService->register($request, Vendor::class);
+    }
+
+    public function logout() {
+        return $this->authService->logout();
+    }
+
+    public function profile() {
+        return $this->authService->user();
     }
 
     /**

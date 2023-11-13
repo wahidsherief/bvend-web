@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\ProductCategory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProductCategorySeeder extends Seeder
@@ -15,24 +14,41 @@ class ProductCategorySeeder extends Seeder
      */
     public function run()
     {
-        $data = [
+        $categories = [
             [
-                'id' => 1,
                 'name' => 'Chips',
-                'brand' => 'Bombay Sweets',
             ],
             [
-                'id' => 2,
                 'name' => 'Shoe',
-                'brand' => 'Nike',
             ],
             [
-                'id' => 3,
                 'name' => 'Computer',
-                'brand' => 'HP',
+            ],
+            [
+                'name' => 'Clothing',
+            ],
+            [
+                'name' => 'Phone',
+            ],
+            [
+                'name' => 'Furniture',
+            ],
+            [
+                'name' => 'Camera',
+            ],
+            [
+                'name' => 'Book',
+            ],
+            [
+                'name' => 'Watch',
+            ],
+            [
+                'name' => 'Bicycle',
             ],
         ];
 
-        ProductCategory::insert($data);
+        foreach ($categories as $category) {
+            ProductCategory::create($category);
+        }
     }
 }

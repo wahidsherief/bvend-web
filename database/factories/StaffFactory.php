@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\Staff;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+class StaffFactory extends Factory
 {
-    protected $model = User::class;
+    protected $model = Staff::class;
 
     public function definition()
     {
@@ -18,6 +18,10 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => bcrypt('123456'),
             'contact' => $this->faker->phoneNumber,
+            'image' => $this->faker->imageUrl(),
+            'additional_contact' => $this->faker->phoneNumber,
+            'nid' => $this->faker->unique()->randomNumber(),
+            'is_active' => $this->faker->boolean,
             'remember_token' => Str::random(10),
         ];
     }
