@@ -4,17 +4,26 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Validation\ValidationException;
+
 class BaseService
 {
-    public function __construct()
+    private $model;
+    private $modelName;
+    private $relations;
+
+    public function initialize($model, $modelName, $relations)
     {
-        // $this->vendor = $vendor;
+        $this->model = $model;
+        $this->modelName = $modelName;
+        $this->relations = $relations;
+        return $this;
     }
 
 
-    public function uploadImage($image, $image_path)
+    public function uploadImage($image)
     {
-        $path = config('global.' . $image_path . '_image_path');
+        $path = config('global.' . $this->modelName . '_image_path');
 
         $image_name = 'bvend-' . $image_path . '-' . time() . '.' . $image->getClientOriginalExtension();
 
@@ -23,45 +32,85 @@ class BaseService
         return $image_name;
     }
 
-    // public function processInputForUpdate($item, $attributes, $image_path)
-    // {
-    //     $name = strtolower(isset($attributes['name']) ? $attributes['name'] : 'unnammed');
-
-    //     if (isset($attributes['image'])) {
-    //         $path = config('global.' . $image_path . '_image_path');
-    //         $file = $path . $item->image;
-
-    //         if (file_exists($file)) {
-    //             unlink($file);
-    //         }
-
-    //         $image = $attributes['image'];
-    //         $image_name = 'bvend-' . $image_path . '-' . $name . '-' . time() . '.' . $image->getClientOriginalExtension();
-    //         $image->move($path, $image_name);
-    //         $attributes['image'] = $image_name;
-    //     }
-
-    //     return $this->checkInput($attributes);
-    // }
-
-    // private function checkInput($attributes)
-    // {
-    //     if (isset($attributes['password'])) {
-    //         $attributes['password'] = Hash::make($attributes['password']);
-    //     }
-
-    //     if (isset($attributes['approved'])) {
-    //         $attributes['is_approved'] = $attributes['approved'] == 'on' ? 1 : 0;
-    //     }
-
-    //     return $attributes;
-    // }
-
-    public function deleteImage($item, $image_path)
+    public function deleteImage($item)
     {
-        $file = config('global.' . $image_path . '_image_path') . $item->image;
-        if (file_exists($file)) {
-            unlink($file);
+        $file = config('global.' . $this->modelName . '_image_path') . $item->image;
+
+        return file_exists($file) ? unlink($file) : false;
+
+    }
+
+    private function processData($inputData)
+    {
+        $data = $inputData->all();
+
+        // if ($data && $inputData->has('image')) {
+        //     $data['image'] = $this->uploadImage($inputData->file('image'));
+        // }
+
+        if (isset($inputData->is_active)) {
+            $data['is_active'] = $inputData->is_active === true ? 1 : 0;
         }
+
+        if (isset($inputData->password)) {
+            $data['password'] = bcrypt($inputData->password);
+        }
+
+        return $data;
+    }
+
+    private function getModelWithRelations($message = null, $id = null)
+    {
+        $data = $id
+            ? $this->model::with($this->relations)->find($id)
+            : $this->model::with($this->relations)->get();
+
+        return $data ? successResponse($message, $data) : errorResponse($message);
+    }
+
+    public function all()
+    {
+        return $this->getModelWithRelations();
+    }
+
+    public function get($id)
+    {
+        return $this->getModelWithRelations($id);
+    }
+
+    public function save($userData)
+    {
+
+        $data = $this->processData($userData);
+
+        $this->model::create($data);
+
+        return $this->getModelWithRelations($this->modelName . ' saved');
+    }
+
+    public function update($userData, $id)
+    {
+        $data = $this->processData($userData);
+
+        $this->model::find($id)->update($data);
+
+        return $this->getModelWithRelations($this->modelName . ' updated');
+    }
+
+    public function delete($id)
+    {
+        $modelData = $this->model::find($id);
+
+        if ($modelData && isset($modelData->image)) {
+            $this->deleteImage($modelData->image);
+        }
+
+        if ($modelData && isset($modelData->{'qr-code'})) {
+            $this->deleteImage($modelData->{'qr-code'});
+        }
+
+        $isDeleted = $modelData->delete() ? true : false;
+
+        return $isDeleted ? $this->getModelWithRelations($this->modelName . ' deleted') : errorResponse($this->modelName . ' delete');
     }
 }

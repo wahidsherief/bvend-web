@@ -12,13 +12,12 @@ class Vendor extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [ 'name', 'email', 'password' ];
-
     protected $hidden = [ 'password', 'remember_token'];
 
-    protected $cast = [ 'email_verified_at' => 'datetime'];
+    protected $casts = [ 'email_verified_at' => 'datetime'];
 
     protected $primaryKey = 'id';
+
     protected $guarded = ['id'];
 
     public function getJWTIdentifier () {
@@ -31,7 +30,6 @@ class Vendor extends Authenticatable implements JWTSubject
 
     public function vendorMachine()
     {
-        return $this->hasOne('App\Models\VendorMachine', 'vendors_id', 'id');
+        return $this->hasOne('App\Models\VendorMachine', 'id', 'vendors_id');
     }
-    
 }

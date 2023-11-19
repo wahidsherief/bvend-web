@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\VendorAccount;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MachineUpdateRequest extends FormRequest
+class SaveProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,10 @@ class MachineUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'product_categories_id' => 'required',
+            'name' => 'required',
+            'description' => 'nullable',
+            // 'image' => 'required|mimes:jpg,png,jpeg|image'
         ];
     }
 }

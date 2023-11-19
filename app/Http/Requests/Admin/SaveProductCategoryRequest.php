@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\VendorAccount;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MachineStoreRequest extends FormRequest
+class SaveProductCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,7 @@ class MachineStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'vendor_id' => 'required',
-            'category_id' => 'required',
-            'type' => 'required',
-            'address' => 'required',
+            'name' => 'required|unique:product_categories'
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\MachineController;
+use App\Http\Controllers\MachineTypeController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\VendorMachineController;
 use App\Http\Controllers\PaymentController;
@@ -50,6 +51,12 @@ Route::group(['middleware' => ['jwt.role:user', 'jwt.auth'], 'prefix' => 'user']
     Route::get('/', [UserController::class, 'profile']);
 });
 
+// Route::prefix('product')->group(function () {
+//     Route::apiResource('/category', ProductCategoryController::class);
+//     Route::apiResource('/', ProductController::class)->parameters(['' => 'product']);
+// });
+
+
 // auth - admin
 Route::group(['prefix' => 'admin'], function ($router) {
     Route::post('/register', [AdminController::class, 'register']);
@@ -57,22 +64,39 @@ Route::group(['prefix' => 'admin'], function ($router) {
 });
 
 Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin'], function ($router) {
-    Route::post('/logout', [AdminController::class, 'logout']);
     Route::get('/', [AdminController::class, 'profile']);
-    
+    Route::post('/logout', [AdminController::class, 'logout']);
+
+    Route::prefix('product')->group(function () {
+        Route::apiResource('/category', ProductCategoryController::class);
+        Route::apiResource('/', ProductController::class)->parameters(['' => 'product']);
+    });
+
+    Route::prefix('vendor')->group(function () {
+        Route::apiResource('/', VendorController::class)->parameters(['' => 'vendor']);
+    });
+
+
+    Route::prefix('machine')->group(function () {
+        Route::apiResource('/type', MachineTypeController::class);
+        Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
+    });
+
+    Route::apiResource('transaction/', TransactionController::class);
+
 });
 
 // auth - staff
-Route::group(['prefix' => 'staff'], function ($router) {
-    Route::post('/login', [StaffController::class, 'login']);
-    Route::post('/register', [StaffController::class, 'register']);
-});
+// Route::group(['prefix' => 'staff'], function ($router) {
+//     Route::post('/login', [StaffController::class, 'login']);
+//     Route::post('/register', [StaffController::class, 'register']);
+// });
 
-Route::group(['middleware' => ['jwt.role:staff', 'jwt.auth'], 'prefix' => 'staff'], function ($router) {
-    Route::post('/logout', [StaffController::class, 'logout']);
-    Route::get('/', [StaffController::class, 'profile']);
-    
-});
+// Route::group(['middleware' => ['jwt.role:staff', 'jwt.auth'], 'prefix' => 'staff'], function ($router) {
+//     Route::post('/logout', [StaffController::class, 'logout']);
+//     Route::get('/', [StaffController::class, 'profile']);
+
+// });
 
 // auth - vendor
 Route::group(['prefix' => 'vendor'], function ($router) {
@@ -83,7 +107,7 @@ Route::group(['prefix' => 'vendor'], function ($router) {
 Route::group(['middleware' => ['jwt.role:vendor', 'jwt.auth'], 'prefix' => 'vendor'], function ($router) {
     Route::post('/logout', [VendorController::class, 'logout']);
     Route::get('/', [VendorController::class, 'profile']);
-    
+
 });
 
 /** Auth routes -- ends */
@@ -93,22 +117,3 @@ Route::get('vendor/machine/refill/{id}', [VendorMachineController::class, 'getRe
 Route::post('vendor/machine/refill/', [VendorMachineController::class, 'storeRefill']);
 
 Route::post('bkash', [PaymentController::class, 'bkashWebhook']);
-
-Route::prefix('product')->group(function () {
-    Route::apiResource('category', ProductCategoryController::class);
-    // this route should put at the bottom of other routes
-    Route::apiResource('/', ProductController::class)->parameters(['' => 'product']);
-});
-
-Route::prefix('vendor')->group(function () {
-    // this route should put at the bottom of other routes
-    Route::apiResource('/', VendorController::class)->parameters(['' => 'vendor']);
-});
-
-
-Route::prefix('machine')->group(function () {
-    // this route should put at the bottom of other routes
-    Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
-});
-
-Route::apiResource('transaction/', TransactionController::class);

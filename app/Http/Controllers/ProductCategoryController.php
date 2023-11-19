@@ -6,80 +6,44 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\SaveProductCategoryRequest;
+use App\Http\Requests\Admin\UpdateProductCategoryRequest;
 
 class ProductCategoryController extends Controller
 {
-    protected $service;
-    protected $product_category;
+    private $service;
+    private $model;
+    private $modelName = 'product_category';
+    private $relations = [];
 
-    public function __construct(BaseService $service, ProductCategory $product_category)
+    public function __construct(BaseService $service, ProductCategory $productCategory)
     {
-        // $this->middleware('auth:admin');
-        $this->service = $service;
-        $this->product_category = $product_category;
+        $this->model = $productCategory;
+        $this->service = $service->initialize($this->model, $this->modelName, $this->relations);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return response()->json($this->product_category->all(), 200);
+        return $this->service->all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $stored = $this->product_category->create($request->all());
-        if ($stored) {
-            return $this->index();
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        return $this->service->get($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function store(SaveProductCategoryRequest $request)
     {
-        $updated = tap($this->product_category->find($id))->update($request->all());
-        if ($updated) {
-            return $this->index();
-        }
+        return $this->service->save($request);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function update(UpdateProductCategoryRequest $request, $id)
+    {
+        return $this->service->update($request, $id);
+    }
+
     public function destroy($id)
     {
-        $destroyed = $this->product_category->find($id)->delete();
-        if ($destroyed) {
-            return $this->index();
-        }
+        return $this->service->delete($id);
     }
 }

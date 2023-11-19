@@ -14,9 +14,11 @@ class CreateLocksTable extends Migration
     public function up()
     {
         Schema::create('locks', function (Blueprint $table) {
-            $table->integer('machine_id');
-            $table->integer('row_id');
-            $table->integer('lock_id');
+            $table->string('lock_code');
+            $table->integer('machines_id');
+            $table->integer('row_number');
+            $table->integer('column_number');
+            $table->integer('lock_number');
             $table->integer('refill_id');
             $table->boolean('empty')->default(0);
             $table->boolean('refilled')->default(0);

@@ -3,42 +3,104 @@
 namespace App\Services;
 
 use App\Models\Machine;
+use App\Models\Lock;
+use App\Models\MachineType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\File;
 
 class MachineService
 {
     protected $mqttservice;
+    private $relations;
 
     public function __construct(MqttService $mqttservice)
     {
         $this->mqttservice = $mqttservice;
+        $this->relations = [
+            'machineType',
+            'vendor',
+            'productCategories'
+        ];
     }
 
-    public function store($request)
+    public function all()
     {
-        $machine_code = mt_rand(100000, 999999);
+        $machines = Machine::with($this->relations)->get() ?? 0;
 
-        if ($this->generateQRCode($machine_code, $request->type)) {
-            $machine_id = $this->saveMachineToDB($machine_code, $request);
+        return $machines ? successResponse(null, $machines) : errorResponse();
+    }
 
-            if ($machine_id) {
-                $saved = $this->saveLocksToDB($machine_id, $request);
-                return $saved;
-            }
+    public function get($id)
+    {
+        $machine = Machine::with($this->relations)->find($id);
+
+        return $machine ? successResponse(null, $machine) : errorResponse();
+    }
+
+    public function save($request)
+    {
+        $code = 'b' . mt_rand(100000, 999999);
+
+        $machineType = MachineType::find($request->machine_types_id)->type;
+
+        $isQRcodeGenerated = $this->generateQRCode($code, $machineType);
+
+        if(!$isQRcodeGenerated) {
+            return errorResponse('QR code generation failed');
         }
-    }
 
-    public function toggleMachineActivation($machine_id, $attributes)
-    {
-        return Machine::where('id', $machine_id)->update($attributes);
+        $machine = $this->createMachine($request);
+
+        if(!$machine) {
+            return errorResponse('Machine create failed');
+        }
+
+        $isLocksCreated = $this->createMachineLocks($machine, $request);
+
+        if($isLocksCreated) {
+            return successResponse(Machine::with($this->relations)->get());
+        }
+
+        Machine::find($machine->id)->delete();
+
+        return errorResponse('Machine create failed');
     }
 
     public function update($request)
     {
         $attributes = $this->processUpdateInputs($request);
 
-        return Machine::where('id', $request->machine_id)->update($attributes);
+        $isUpdated = Machine::where('id', $request->machine_id)->update($attributes);
+
+        return $isUpdated ? successResponse('Machine', Machine::find($request->machine_id)) : errorResponse();
+    }
+
+    public function delete($id)
+    {
+        $machine = Machine::find($id);
+
+        $isDeleted = $machine !== null ? $machine->delete() : 0;
+
+        if(!$isDeleted) {
+            return errorResponse('Machine delete failed');
+        }
+
+        if ($machine->has('qr-code')) {
+            $this->service->deleteImage($machine->file('qr-code'), 'machine');
+        }
+
+        if ($machine->has('image')) {
+            $this->service->deleteImage($machine->file('image'), 'machine');
+        }
+
+        return successResponse(Machine::all());
+    }
+
+    public function toggleMachineActivation($machine_id, $attributes)
+    {
+        return Machine::where('id', $machine_id)->update($attributes);
     }
 
     private function processUpdateInputs($request)
@@ -51,121 +113,79 @@ class MachineService
         return $data;
     }
 
-    public function machineByID($id)
+    private function createMachineLocks($machine, $request)
     {
-        return Machine::where('id', $id)->first();
-    }
+        $noOfRows = $request->no_of_rows;
+        $noOfColumns = $request->no_of_columns;
+        $noOfLocksPerColumn = $request->locks_per_column;
 
-
-    private function saveLocksToDB($machine_id, $request)
-    {
-        $locks_per_channel = $request->locks_per_channel;
-        $no_of_channels = $request->no_of_channels;
-        $total_locks = $locks_per_channel * $no_of_channels;
+        $totalLocks = $noOfRows * $noOfColumns * $noOfLocksPerColumn;
 
         $locks = [];
-        $channel = 1;
-        $lock = 1;
-        for ($i=1; $i <= $total_locks; $i++) {
-            $locks[$i]['machine_id'] = $machine_id;
-            $locks[$i]['channel_id'] = $channel;
-            $locks[$i]['lock_id'] = $lock++;
-            $locks[$i]['refill_id'] = 0;
-            $locks[$i]['created_at'] = now();
-            $locks[$i]['updated_at'] = now();
+        $lockCount = 0;
 
-            if ($lock > $locks_per_channel) {
-                $channel++;
-                $lock = 1;
-            }
+        for ($lock = 1; $lock <= $totalLocks; $lock++) {
+            $row = ceil($lock / ($noOfColumns * $noOfLocksPerColumn));
+            $column = ceil(($lock % ($noOfColumns * $noOfLocksPerColumn)) / $noOfLocksPerColumn) ?: $noOfColumns;
+            $lockNumber = $lock % $noOfLocksPerColumn ?: $noOfLocksPerColumn;
+
+            $lockCode = $machine->machine_code . substr($machine->machineType->type, 0, 1) . $row . $column . $lockNumber;
+
+            $locks[$lockCount] = [
+                'machines_id' => $machine->id,
+                'lock_code' => $lockCode,
+                'row_number' => $row,
+                'column_number' => $column,
+                'lock_number' => $lockNumber,
+                'refill_id' => 1,
+            ];
+            $lockCount++;
         }
 
-        return DB::table('locks')->insert($locks);
+        return Lock::insert($locks);
     }
 
     private function generateQRCode($machine_code, $type)
     {
-        try {
-            $code = 'BVENDMACHINECODE-' . $machine_code;
-            $url = public_path('uploads/machine_qr_codes/' . $type . '-' . $machine_code . '.png');
-            // dd($url);
-            \QrCode::format('png')
-                ->margin(0)
-                ->size(500)
-                ->generate($code, $url);
+        $storagePath = config('global.qrcode_image_path');
+        $code = 'BVMC-' . $machine_code;
+        $qr_code = $type . '-' . $machine_code . '.png';
+        $imagePath = $storagePath . $qr_code;
 
-            return true;
-        } catch (\Exception $e) {
-            report($e);
-            return false;
-        }
+        \QrCode::format('png')
+            ->margin(0)
+            ->size(500)
+            ->generate($code, $imagePath);
+
+        return File::exists($imagePath) ? true : false;
     }
 
-    private function saveMachineToDB($machine_code, $request)
+    private function createMachine($request)
     {
-        $category_stored = 1;
+        $data = $request->all();
 
-        $data = [
-            'vendor_id' => $request->vendor_id,
-            'machine_type' => $request->type,
-            'no_of_channels' => $request->no_of_channels,
-            'locks_per_channel' => $request->locks_per_channel,
-            'address' => $request->address,
-            'machine_code' => $machine_code,
-            'qr_code' => $machine_code,
-            'temperature' => 'test_code',
-            'humidity' => 1,
-            'fan_status' => 'off',
-        ];
+        $machine = Machine::create($data);
 
-        $machine_id = Machine::insertGetId($data);
-
-        if ($request->category_id) {
-            $categories = [];
-            foreach ($request->category_id as $category_id) {
-                $category = [
-                    'vendor_id' => $request->vendor_id,
-                    'machine_id' => $machine_id,
-                    'product_category_id' => $category_id,
-                ];
-
-                array_push($categories, $category);
+        if ($request->categories) {
+            foreach ($request->categories as $category) {
+                $machine->productCategories()->attach($category);
             }
-
-            $category_stored = DB::table('vendor_product_categories')->insert($categories);
         }
 
-        if (!$category_stored) {
-            return false;
-        }
-
-        $vendor_machine_data = [
-            'vendor_id' => $request->vendor_id,
-            'machine_id' => $machine_id,
-            'machine_type' => $request->type,
-            'active' => 1
-        ];
-
-        $vendor_machine_stored = DB::table('vendor_machines')->insert($vendor_machine_data);
-
-        if (!$vendor_machine_stored) {
-            return false;
-        }
-
-        return $machine_id;
+        return $machine;
     }
 
     public function getAllMachinesOfVendor($vendor_id)
     {
-        return Machine::where('vendor_id', $vendor_id)->get();
+        return Machine::where('vendor_id', $vendor_id)->with($this->relations)->get();
     }
 
     public function getSpecificMachineOfVendor($vendor_id, $machine_id)
     {
-        return Machine::where(['id' => $machine_id, 'vendor_id' => $vendor_id])->first();
+        return Machine::where(['id' => $machine_id, 'vendor_id' => $vendor_id])->with($this->relations)->first();
     }
 
-    public function getMachineProductsOfVendor($vendor_id)
+    public function getProductsOfVendor($vendor_id)
     {
         $products = DB::table('products')
                     ->select('products.id', 'products.product_name')

@@ -12,13 +12,27 @@ class Machine extends Model
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
 
+    public function machineType()
+    {
+        return $this->belongsTo('App\Models\MachineType', 'machine_types_id', 'id');
+    }
+
     public function vendor()
     {
         return $this->belongsTo('App\Models\Vendor', 'vendors_id', 'id');
+    }
+    
+    public function locks()
+    {
+        return $this->hasMany('App\Models\Lock', 'machines_id', 'id');
     }
 
     public function refills()
     {
         return $this->hasMany('App\Models\Refill', 'machines_id', 'id');
+    }
+
+    public function productCategories() {
+        return $this->belongsToMany(ProductCategory::class, 'machine_product_category', 'machine_id', 'product_category_id');
     }
 }

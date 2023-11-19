@@ -12,4 +12,8 @@ class ProductCategory extends Model
     protected $primaryKey = 'id';
     // protected $fillable = ['name', 'brand'];
     protected $guarded = [];
+
+    public function machines() {
+        return $this->belongsToMany(Machine::class, 'machine_product_category', 'product_category_id', 'machine_id');
+    }
 }

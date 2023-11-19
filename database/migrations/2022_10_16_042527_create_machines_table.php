@@ -15,10 +15,10 @@ return new class () extends Migration {
         Schema::create('machines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('machine_code');
-            $table->enum('machine_type', ['store', 'box']);
+            $table->smallInteger('machine_types_id');
             $table->integer('no_of_rows');
-            $table->integer('no_of_trays');
-            $table->integer('locks_per_tray');
+            $table->integer('no_of_columns');
+            $table->integer('locks_per_column');
             $table->string('qr_code');
             $table->integer('vendors_id')->nullable();
             $table->string('assign_date')->nullable();
