@@ -1,9 +1,3 @@
 RewriteEngine On
-
-# If the request is not for the public folder
 RewriteCond %{REQUEST_URI} !^/public/
-# And if the request is not for an existing file or directory
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-# Then internally rewrite the request to the public folder
-RewriteRule ^(.*)$ /public/$1 [L]
+RewriteRule ^(.*)$ /public/$1 [L,QSA]
