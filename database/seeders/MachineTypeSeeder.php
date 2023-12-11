@@ -18,18 +18,18 @@ class MachineTypeSeeder extends Seeder
             [
                 'name' => 'Store',
             ],
-            [
-                'name' => 'Box',
-            ],
-            [
-                'name' => 'Wash',
-            ],
-            [
-                'name' => 'Dry',
-            ],
-            [
-                'name' => 'Charge',
-            ],
+            // [
+            //     'name' => 'Box',
+            // ],
+            // [
+            //     'name' => 'Wash',
+            // ],
+            // [
+            //     'name' => 'Dry',
+            // ],
+            // [
+            //     'name' => 'Charge',
+            // ],
         ];
 
         foreach ($types as $type) {
