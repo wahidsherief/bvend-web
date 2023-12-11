@@ -14,11 +14,12 @@ return new class () extends Migration {
     {
         Schema::create('refills', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('machines_id');
-            $table->integer('row');
-            $table->integer('tray');
-            $table->integer('products_id')->nullable();
+            $table->integer('machine_id');
+            $table->integer('row_no');
+            $table->integer('column_no');
+            $table->integer('capacity');
             $table->integer('quantity')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->integer('price')->nullable();
             $table->timestamps();
         });

@@ -14,13 +14,13 @@ class SaveMachineRequest extends FormRequest
     public function rules()
     {
         return [
-            'machine_types_id' => 'required|integer',
+            'machine_type_id' => 'required|integer',
             'no_of_rows' => 'required|integer',
             'no_of_columns' => 'required|integer',
-            'locks_per_column' => 'required|integer',
-            'qr_code' => 'required|string',
-            'vendors_id' => 'required|integer',
-            'assign_date' => 'nullable|date',
+            'capacity' => 'required|integer',
+            'qr_code' => 'string',
+            'bkash_qr_code' => 'image',
+            'vendor_id' => 'required|integer',
             'location' => 'nullable|string',
         ];
     }
@@ -34,18 +34,18 @@ class SaveMachineRequest extends FormRequest
             'date' => 'The :attribute field must be a valid date.',
         ];
     }
-    
+
     public function attributes()
     {
         return [
             'machine_code' => 'Machine Code',
             'machine_types_id' => 'Machine Type ID',
             'no_of_rows' => 'Number of Rows',
-            'no_of_trays' => 'Number of Trays',
-            'locks_per_tray' => 'Locks per Tray',
+            'no_of_columns' => 'Number of Channels',
+            'capacity' => 'Number of channel capacity',
             'qr_code' => 'QR Code',
-            'vendors_id' => 'Vendors ID',
-            'assign_date' => 'Assign Date',
+            'bkash_qr_code' => 'bKash QR Code',
+            'vendor_id' => 'Vendors ID',
             'location' => 'Location',
         ];
     }

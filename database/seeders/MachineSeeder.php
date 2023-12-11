@@ -17,16 +17,16 @@ class MachineSeeder extends Seeder
 
     public function run()
     {
-        for ($i=0; $i < 4 ; $i++) {
+        for ($i = 0; $i < 4 ; $i++) {
             $machine = new Machine();
             $machine->machine_code = 'b' . rand(500, 900);
-            $machine->machine_types_id = rand(1, 5);
-            $machine->no_of_rows = 10;
-            $machine->no_of_columns = 6;
-            $machine->locks_per_column = 10;
-            $machine->qr_code = 'avatar.jpg';
-            $machine->vendors_id = rand(1, 3);
-            $machine->assign_date = '';
+            $machine->machine_type_id = rand(1, 5);
+            $machine->no_of_rows = 4;
+            $machine->no_of_columns = 4;
+            $machine->capacity = 10;
+            $machine->qr_code = '';
+            $machine->vendor_id = rand(1, 3);
+            $machine->bkash_qr_code = '';
             $machine->location = '';
             $machine->is_active = 0;
             $machine->save();

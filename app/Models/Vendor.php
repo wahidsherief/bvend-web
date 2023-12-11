@@ -10,7 +10,8 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Vendor extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $hidden = [ 'password', 'remember_token'];
 
@@ -20,16 +21,18 @@ class Vendor extends Authenticatable implements JWTSubject
 
     protected $guarded = ['id'];
 
-    public function getJWTIdentifier () {
-        return $this->getKey();
-    } 
-
-    public function getJWTCustomClaims () {
-        return ['role' => 'vendor'];
-    } 
-
-    public function vendorMachine()
+    public function getJWTIdentifier()
     {
-        return $this->hasOne('App\Models\VendorMachine', 'id', 'vendors_id');
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return ['role' => 'vendor'];
+    }
+
+    public function machines()
+    {
+        return $this->hasMany('App\Models\Machine', 'id', 'vendor_id');
     }
 }

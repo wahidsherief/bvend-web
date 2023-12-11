@@ -24,17 +24,18 @@ class UpdateVendorRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'min:5',
-            'email' => 'unique:vendors|email',
-            'password' => 'min:6',
-            'contact' => 'nullable|digits:11|numeric|unique:vendors',
-            'image' => 'nullable',
-            'business_name' => 'nullable',
-            'additional_contact' => 'nullable|digits:11|numeric|unique:vendors',
-            'trade_licence_no' => 'nullable|regex:/^[0-9]+$/|max:20|unique:vendors',
-            'bank_account_no' => 'nullable|regex:/^[0-9]+$/|max:20|unique:vendors',
-            'nid' => 'nullable|digits_between:10,13|unique:vendors',
-            'is_active' => 'boolean',
+            // 'name' => 'min:5',
+            // 'email' => 'unique:vendors|email',
+            // 'password' => 'min:6',
+            // // 'contact' => 'nullable|digits:11|numeric|unique:vendors',
+            // 'contact' => 'nullable|numeric|unique:vendors',
+            // 'image' => 'nullable',
+            // 'business_name' => 'nullable',
+            // // 'additional_contact' => 'nullable|digits:11|numeric|unique:vendors',
+            // 'trade_licence_no' => 'nullable|unique:vendors',
+            // 'bank_account_no' => 'nullable|unique:vendors',
+            // 'nid' => 'nullable|unique:vendors',
+            // 'is_active' => 'boolean',
         ];
     }
 
@@ -50,7 +51,6 @@ class UpdateVendorRequest extends FormRequest
             'contact.unique' => 'The contact number has already been taken.',
             'is_active.boolean' => 'The is_active field must be true or false.',
         ];
-        
+
     }
 }
-

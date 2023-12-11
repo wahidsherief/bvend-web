@@ -16,14 +16,12 @@ return new class () extends Migration {
         Schema::create('transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('machine_id');
-            $table->string('merchant_number');
+            $table->string('bkash_merchant_number');
             $table->string('customer_number');
-            $table->integer('refill_id');
-            $table->integer('vendor_id');
             $table->string('invoice_no');
             $table->string('bkash_trx_id')->nullable();
+            $table->integer('product_id');
             $table->integer('total_amount');
-            $table->integer('discount');
             $table->integer('payment_method_id')->nullable();
             $table->enum('status', ['Completed', 'Failed'])->default('Failed');
             $table->timestamps();

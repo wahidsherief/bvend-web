@@ -19,8 +19,8 @@ class MqttController extends Controller
         $e = md5($f . $t . $s . $m . $k);
 
         $topic = 'bvend/1000/1';
-        
-        
+
+
         $message = json_encode(["c" => $c,"f" => $f,"t" => $t,"m" => $m,"s" => $s, "e" => $e]);
 
         // $client_id = Auth::user()->id;
@@ -31,10 +31,10 @@ class MqttController extends Controller
             var_dump($message);
             return 'Success \n';
         }
-        
+
         return "Failed";
     }
-    
+
 
     // public function SubscribetoTopic($topic)
     // {

@@ -5,16 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\ProductCategory;
+
 class Product extends Model
 {
     use HasFactory;
 
-    protected $table = 'products';
     protected $primaryKey = 'id';
-    protected $fillable = ['name', 'product_categories_id', 'image', 'unit'];
+
+    protected $guarded = ['id'];
+
+    public $timestamps = false;
 
     public function category()
     {
-        return $this->belongsTo('App\Models\ProductCategory', 'product_categories_id', 'id');
+        return $this->belongsTo(ProductCategory::class, 'product_category_id', 'id');
+    }
+
+    public function machines()
+    {
+        return $this->belongsToMany(Machine::class, 'machine_product')->withPivot('price');
     }
 }

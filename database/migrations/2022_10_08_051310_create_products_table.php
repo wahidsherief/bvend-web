@@ -15,11 +15,10 @@ return new class () extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->integer('product_categories_id');
+            $table->integer('product_category_id');
             $table->string('brand')->nullable();
             $table->string('image');
             $table->boolean('active')->default(1);
-            $table->timestamps();
         });
     }
 

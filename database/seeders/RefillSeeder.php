@@ -20,19 +20,20 @@ class RefillSeeder extends Seeder
         $row = 1;
         $col = 1;
         $col_count = 0;
-        for ($i=1; $i <=30 ; $i++) {
+        for ($i = 1; $i <= 10 ; $i++) {
             if ($col_count == 6) {
                 $row++;
                 $col_count = 0;
                 $col = 1;
             }
             $Refill = new Refill();
-            $Refill->machines_id = 1;
-            $Refill->row = $row;
-            $Refill->tray = $col;
-            $Refill->products_id = null;
-            $Refill->quantity = null;
-            $Refill->price = null;
+            $Refill->machine_id = 1;
+            $Refill->row_no = $row;
+            $Refill->column_no = $col;
+            $Refill->product_id = 1;
+            $Refill->capacity = 10;
+            $Refill->quantity = 10;
+            $Refill->price = 20;
             $Refill->save();
             $col_count++;
             $col++;

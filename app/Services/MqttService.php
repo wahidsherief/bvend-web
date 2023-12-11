@@ -6,76 +6,160 @@ use Mqtt;
 
 class MqttService
 {
-    public function setParameters($request, $packet_id)
+    public function readPortStatus($numberOfData)
     {
-        $m = $this->getMessageFormat($request);
-        $params = [];
-        $params['machine_number'] = $request->machine_id;
-        $params['no_of_products'] = $request->no_of_products;
-        $params['channel_number'] = $request->channel_number;
-        $params['c'] = $packet_id;
-        $params['f'] = '1000001';
-        $params['t'] = $request->machine_number;
-        $params['m'] = $m;
-        $params['s'] = isset($request->transaction_id) ? $request->transaction_id : '0' ; // sales_id
-        $params['k'] = $request->customer_number; // user-id
-        $params['e'] = md5('1000001'. $request->machine_id . $request->transaction_id . $m . $request->customer_number);
-        $message = $this->message($params);
-        $params['message'] = $message;
+        $data = [];
 
-        return $params;
+        for ($i = 1; $i <= $numberOfData; $i++) {
+            $data[] = [
+                "type" => "BicycleCharger",
+                "oid" => (string)$i,
+                "p" => "portstate"
+            ];
+        }
+
+        $result = [
+            "pv" => 1,
+            "fn" => "rd",
+            "ts" => 0,
+            "uid" => 0,
+            "ck" => "0",
+            "from" => "00000001",
+            "pkg" => [
+                [
+                    "to" => "1",
+                    "data" => $data
+                ]
+            ]
+        ];
+
+        $formattedResult = str_replace("=>", ":", json_encode($result, JSON_PRETTY_PRINT));
+        $message = str_replace(["\n", "\r", "\t"], '', $formattedResult);
+
+        return $message;
     }
 
-    public function publish($params)
+    public function replyPortStatus($numberOfData, $statusValue)
     {
-        $topic = '1000/'.$params['machine_number'];
-        $packet_id = $params['c']; // packet_id
-        $message = $params['message'];
+        $data = [];
 
-        return Mqtt::ConnectAndPublish($topic, $message, $packet_id);
+        for ($i = 1; $i <= $numberOfData; $i++) {
+            $data[] = [
+                "type" => "BicycleCharger",
+                "oid" => (string)$i,
+                "p" => "portstate",
+                "val" => (string)$statusValue
+            ];
+        }
+
+        $result = [
+            "pv" => 1,
+            "fn" => "rdf",
+            "ts" => 1000,
+            "uid" => 0,
+            "ck" => "00f7",
+            "from" => "1",
+            "pkg" => [
+                [
+                    "to" => "00000001",
+                    "data" => $data
+                ]
+            ]
+        ];
+
+        $formattedResult = str_replace("=>", ":", json_encode($result, JSON_PRETTY_PRINT));
+        $message = str_replace(["\n", "\r", "\t"], '', $formattedResult);
+
+        return $message;
     }
-    
 
-    public function subscribe($params)
+    public function sendOrder($orderNumber, $amount)
     {
-        $topic = '1000/1000001';
-        $packet_id = $params['c']; // packate_id
+        $result = [
+            "pv" => 1,
+            "fn" => "wt",
+            "ts" => 0,
+            "uid" => 0,
+            "ck" => "0",
+            "from" => "00000001",
+            "pkg" => [
+                [
+                    "to" => "1",
+                    "data" => [
+                        [
+                            "type" => "BicycleCharger",
+                            "oid" => 2,
+                            "p" => "ordernum",
+                            "val" => (string)$orderNumber
+                        ],
+                        [
+                            "type" => "BicycleCharger",
+                            "oid" => 2,
+                            "p" => "numMoney",
+                            "val" => $amount
+                        ]
+                    ]
+                ]
+            ]
+        ];
 
+        $formattedResult = str_replace("=>", ":", json_encode($result, JSON_PRETTY_PRINT));
+        $message = str_replace(["\n", "\r", "\t"], '', $formattedResult);
+
+        return $message;
+    }
+
+    public function replyOrder($orderNumber, $orderState)
+    {
+        $reply = [
+            "pv" => 1,
+            "fn" => "wtf",
+            "ts" => 0,
+            "uid" => 0,
+            "ck" => "0",
+            "from" => "1",
+            "pkg" => [
+                [
+                    "to" => "00000001",
+                    "data" => [
+                        [
+                            "type" => "BicycleCharger",
+                            "oid" => 2,
+                            "p" => "ordernum",
+                            "val" => $orderNumber
+                        ],
+                        [
+                            "type" => "BicycleCharger",
+                            "oid" => 2,
+                            "p" => "orderstate",
+                            "val" => $orderState
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $replacedReply = str_replace("=>", ":", json_encode($reply, JSON_PRETTY_PRINT));
+        $message = str_replace(["\n", "\r", "\t"], '', $formattedResult);
+
+        return $message;
+    }
+
+
+
+    public function publish($topic, $message)
+    {
+        return Mqtt::ConnectAndPublish($topic, $message);
+    }
+
+    public function subscribe($topic)
+    {
         Mqtt::ConnectAndSubscribe($topic, function ($topic, $message) {
             echo "Msg Received: \n";
             echo "Topic: {$topic}\n\n";
             echo "\t$message\n\n";
 
             return $message;
-        }, $packet_id);
-    }
-
-    private function message($params)
-    {
-        return json_encode([
-            "c" => $params['c'],
-            "f" => $params['f'],
-            "t" => $params['t'],
-            "m" => $params['m'],
-            "s" => $params['s'], 
-            "e" => $params['e']
-        ]);
-    }
-
-    private function getMessageFormat($request)
-    {
-        if (isset($request->no_of_products, $request->channel_number)) {
-            return $request->no_of_products .'&'. $request->channel_number;
-        } elseif (isset($request->server_health_status)) {
-            return $request->server_health_status;
-        } elseif (isset($request->run_time)) {
-            return $request->run_time;
-        } elseif (isset($request->lighting_on_time)) {
-            return $request->lighting_on_time;
-        } elseif (isset($request->current_clock_time)) {
-            return $request->current_clock_time;
-        } else {
-            return '0';
-        }
+        });
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminVendorController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
@@ -15,46 +16,23 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\VendorMachineController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MqttController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\VendorProductController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HardwareController;
+use App\Http\Controllers\DashboardController;
 
 /** test routes -- start */
 
 Route::get('mqtt/publish', [MqttController::class, 'publishTopic']);
 
-/** test routes -- end */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+// Route::get('/test', [HardwareController::class, 'order']);
+
+/** test routes -- end */
 
 
 /** Auth routes -- starts */
-
-// auth - user
-Route::group(['prefix' => 'user'], function ($router) {
-    Route::post('/login', [UserController::class, 'login']);
-    Route::post('/register', [UserController::class, 'register']);
-});
-
-Route::group(['middleware' => ['jwt.role:user', 'jwt.auth'], 'prefix' => 'user'], function ($router) {
-    Route::post('/logout', [UserController::class, 'logout']);
-    Route::get('/', [UserController::class, 'profile']);
-});
-
-// Route::prefix('product')->group(function () {
-//     Route::apiResource('/category', ProductCategoryController::class);
-//     Route::apiResource('/', ProductController::class)->parameters(['' => 'product']);
-// });
 
 
 // auth - admin
@@ -64,8 +42,11 @@ Route::group(['prefix' => 'admin'], function ($router) {
 });
 
 Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin'], function ($router) {
+
     Route::get('/', [AdminController::class, 'profile']);
     Route::post('/logout', [AdminController::class, 'logout']);
+
+    Route::get('/dashboard', [DashboardController::class, 'getAdminDashboard']);
 
     Route::prefix('product')->group(function () {
         Route::apiResource('/category', ProductCategoryController::class);
@@ -73,30 +54,23 @@ Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin
     });
 
     Route::prefix('vendor')->group(function () {
-        Route::apiResource('/', VendorController::class)->parameters(['' => 'vendor']);
+        Route::apiResource('/', AdminVendorController::class)->parameters(['' => 'vendor']);
     });
 
 
     Route::prefix('machine')->group(function () {
         Route::apiResource('/type', MachineTypeController::class);
-        Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
+        // Route::apiResource('/', MachineController::class)->parameters(['' => 'machine']);
+
+        Route::get('/', [MachineController::class, 'getMachines']);
+        Route::post('/', [MachineController::class, 'createMachine']);
+        Route::put('/{id}', [MachineController::class, 'updateMachine']);
+        Route::delete('/{id}', [MachineController::class, 'deleteMachine']);
     });
 
-    Route::apiResource('transaction/', TransactionController::class);
 
 });
 
-// auth - staff
-// Route::group(['prefix' => 'staff'], function ($router) {
-//     Route::post('/login', [StaffController::class, 'login']);
-//     Route::post('/register', [StaffController::class, 'register']);
-// });
-
-// Route::group(['middleware' => ['jwt.role:staff', 'jwt.auth'], 'prefix' => 'staff'], function ($router) {
-//     Route::post('/logout', [StaffController::class, 'logout']);
-//     Route::get('/', [StaffController::class, 'profile']);
-
-// });
 
 // auth - vendor
 Route::group(['prefix' => 'vendor'], function ($router) {
@@ -108,12 +82,15 @@ Route::group(['middleware' => ['jwt.role:vendor', 'jwt.auth'], 'prefix' => 'vend
     Route::post('/logout', [VendorController::class, 'logout']);
     Route::get('/', [VendorController::class, 'profile']);
 
+
+    Route::get('/dashboard/{vendorId}/', [DashboardController::class, 'getVendorDashboard']);
+    Route::get('/{vendorId}/machines', [MachineController::class, 'getVendorMachines']);
+    Route::post('/refill', [MachineController::class, 'saveMachineRefill']);
+    Route::put('/price', [MachineController::class, 'setMachineProductPrice']);
 });
 
-/** Auth routes -- ends */
-
-Route::get('vendor/machines/{id}', [VendorMachineController::class, 'index']);
-Route::get('vendor/machine/refill/{id}', [VendorMachineController::class, 'getRefills']);
-Route::post('vendor/machine/refill/', [VendorMachineController::class, 'storeRefill']);
 
 Route::post('bkash', [PaymentController::class, 'bkashWebhook']);
+Route::get('/customer/machine/{id}', [CustomerController::class, 'getMachine']);
+Route::post('/customer/payment', [CustomerController::class, 'cachePaymentResponse']);
+Route::post('/customer/order', [CustomerController::class, 'dispatchOrderAndSaveData']);

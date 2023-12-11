@@ -20,12 +20,11 @@ class BaseService
         return $this;
     }
 
-
     public function uploadImage($image)
     {
         $path = config('global.' . $this->modelName . '_image_path');
 
-        $image_name = 'bvend-' . $image_path . '-' . time() . '.' . $image->getClientOriginalExtension();
+        $image_name = 'B' . time() . '.' . $image->getClientOriginalExtension();
 
         $image->move($path, $image_name);
 
@@ -34,67 +33,94 @@ class BaseService
 
     public function deleteImage($item)
     {
-        $file = config('global.' . $this->modelName . '_image_path') . $item->image;
+        $filePath = config('global.' . $this->modelName . '_image_path') . $item;
 
-        return file_exists($file) ? unlink($file) : false;
-
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 
-    private function processData($inputData)
+
+    private function processData($request)
     {
-        $data = $inputData->all();
+        $data = $request->all();
 
-        // if ($data && $inputData->has('image')) {
-        //     $data['image'] = $this->uploadImage($inputData->file('image'));
-        // }
-
-        if (isset($inputData->is_active)) {
-            $data['is_active'] = $inputData->is_active === true ? 1 : 0;
+        // for upload image on save item
+        if ($request->hasFile('image') && !$request->has('shouldUpload')) {
+            $data['image'] = $this->uploadImage($request->file('image'));
         }
 
-        if (isset($inputData->password)) {
-            $data['password'] = bcrypt($inputData->password);
+        // for upload image on update item
+        if ($request->hasFile('image') && $request->shouldUpload == true) {
+            $model = $this->model::find($request->id);
+            $this->deleteImage($model->image);
+            $data['image'] = $this->uploadImage($request->file('image'));
         }
 
-        return $data;
+        if (isset($request->password)) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        return filterEmptyValues($data);
     }
 
-    private function getModelWithRelations($message = null, $id = null)
+    private function getModelWithRelations($id = null)
     {
-        $data = $id
+        return $data = $id
             ? $this->model::with($this->relations)->find($id)
             : $this->model::with($this->relations)->get();
-
-        return $data ? successResponse($message, $data) : errorResponse($message);
     }
 
     public function all()
     {
-        return $this->getModelWithRelations();
+        $model =  $this->getModelWithRelations();
+
+        return $model
+            ? successResponse($this->modelName . ' fetched successfully.', $model)
+            : errorResponse($this->modelName . ' fetch failed.');
     }
 
     public function get($id)
     {
-        return $this->getModelWithRelations($id);
+        $model = $this->getModelWithRelations($id);
+
+        return $model
+            ? successResponse($this->modelName . ' fetched successfully.', $model)
+            : errorResponse($this->modelName . ' fetch failed.');
     }
 
-    public function save($userData)
+    public function save($request)
     {
+        $data = $this->processData($request);
 
-        $data = $this->processData($userData);
+        $isCreated = $this->model::create($data);
 
-        $this->model::create($data);
+        if (!$isCreated) {
+            errorResponse($this->modelName . ' save failed.');
+        }
 
-        return $this->getModelWithRelations($this->modelName . ' saved');
+        $model = $this->getModelWithRelations();
+
+        return $model
+            ? successResponse($this->modelName . ' saved successfully.', $model)
+            : errorResponse($this->modelName . ' save failed.');
     }
 
-    public function update($userData, $id)
+    public function update($request, $id)
     {
-        $data = $this->processData($userData);
+        $data = $this->processData($request);
 
-        $this->model::find($id)->update($data);
+        $isUpdated = $this->model::find($id)->update($data);
 
-        return $this->getModelWithRelations($this->modelName . ' updated');
+        if (!$isUpdated) {
+            errorResponse($this->modelName . ' update failed.');
+        }
+
+        $model = $this->getModelWithRelations();
+
+        return $model
+            ? successResponse($this->modelName . ' updated successfully.', $model)
+            : errorResponse($this->modelName . ' update failed.');
     }
 
     public function delete($id)
@@ -105,12 +131,20 @@ class BaseService
             $this->deleteImage($modelData->image);
         }
 
-        if ($modelData && isset($modelData->{'qr-code'})) {
-            $this->deleteImage($modelData->{'qr-code'});
+        if ($modelData && isset($modelData->qr_code)) {
+            $this->deleteImage($modelData->qr_code);
         }
 
-        $isDeleted = $modelData->delete() ? true : false;
+        $isDeleted = $modelData && $modelData->delete() ;
 
-        return $isDeleted ? $this->getModelWithRelations($this->modelName . ' deleted') : errorResponse($this->modelName . ' delete');
+        if (!$isDeleted) {
+            errorResponse($this->modelName . ' delete failed.');
+        }
+
+        $model = $this->getModelWithRelations();
+
+        return $model
+            ? successResponse($this->modelName . ' deleted successfully.', $model)
+            : errorResponse($this->modelName . ' delete failed.');
     }
 }

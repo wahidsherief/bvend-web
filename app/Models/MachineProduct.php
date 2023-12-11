@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Refill extends Model
+use App\Models\Product;
+
+class MachineProduct extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'id';
-    protected $guarded = ['id'];
+    protected $table = 'machine_product';
+
+    public $timestamps = false;
 
     public function product()
     {
-        return $this->belongsTo('App\Models\Product', 'product_id', 'id');
+        return $this->belongsTo(Product::class);
     }
 }

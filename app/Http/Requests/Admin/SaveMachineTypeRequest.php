@@ -24,7 +24,7 @@ class SaveMachineTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|unique:machine_types'
+            'name' => 'required|unique:machine_types'
         ];
     }
 }

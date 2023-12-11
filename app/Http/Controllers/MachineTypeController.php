@@ -33,6 +33,7 @@ class MachineTypeController extends Controller
 
     public function store(SaveMachineTypeRequest $request)
     {
+        $request->name = ucfirst($request->name);
         return $this->service->save($request);
     }
 

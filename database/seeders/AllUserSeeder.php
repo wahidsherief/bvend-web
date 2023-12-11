@@ -15,13 +15,14 @@ class AllUserSeeder extends Seeder
         // Create regular users
         User::factory()->count(6)->create();
 
+
         // Create admins
         Admin::factory()->count(1)->create();
 
         // Create vendors
-        Vendor::factory()->count(3)->create();
+        // Vendor::factory()->count(3)->create();
 
         // Create staff
-        Staff::factory()->count(6)->create();
+        // Staff::factory()->count(6)->create();
     }
 }

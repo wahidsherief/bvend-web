@@ -16,19 +16,19 @@ class MachineTypeSeeder extends Seeder
     {
         $types = [
             [
-                'type' => 'store',
+                'name' => 'Store',
             ],
             [
-                'type' => 'box',
+                'name' => 'Box',
             ],
             [
-                'type' => 'wash',
+                'name' => 'Wash',
             ],
             [
-                'type' => 'dry',
+                'name' => 'Dry',
             ],
             [
-                'type' => 'charge',
+                'name' => 'Charge',
             ],
         ];
 

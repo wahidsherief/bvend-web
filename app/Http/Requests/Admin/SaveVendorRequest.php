@@ -23,19 +23,20 @@ class SaveVendorRequest extends FormRequest
      */
     public function rules()
     {
-        
-        
+
+
         return [
             'name' => 'required|min:5',
             'email' => 'required|unique:vendors|email',
             'password' => 'required|min:6',
-            'contact' => 'nullable|digits:11|numeric|unique:vendors',
-            'image' => 'required|nullable',
+            'contact' => 'nullable|numeric|unique:vendors',
+            'image' => 'required',
             'business_name' => 'nullable',
-            'additional_contact' => 'nullable|digits:11|numeric|unique:vendors',
-            'trade_licence_no' => 'nullable|regex:/^[0-9]+$/|max:20|unique:vendors',
-            'bank_account_no' => 'nullable|regex:/^[0-9]+$/|max:20|unique:vendors',
-            'nid' => 'nullable|digits_between:10,13|unique:vendors',
+            'additional_contact' => 'nullable|numeric|unique:vendors',
+            'trade_licence_no' => 'nullable|unique:vendors',
+            // 'bank_account_no' => 'nullable|regex:/^[0-9]+$/|max:20|unique:vendors',
+            'bank_account_no' => 'nullable|unique:vendors',
+            'nid' => 'nullable|unique:vendors',
             'is_active' => 'boolean',
         ];
     }
@@ -69,4 +70,3 @@ class SaveVendorRequest extends FormRequest
         ];
     }
 }
-

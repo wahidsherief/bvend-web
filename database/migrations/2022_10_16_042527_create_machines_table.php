@@ -15,13 +15,13 @@ return new class () extends Migration {
         Schema::create('machines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('machine_code');
-            $table->smallInteger('machine_types_id');
+            $table->smallInteger('machine_type_id');
             $table->integer('no_of_rows');
             $table->integer('no_of_columns');
-            $table->integer('locks_per_column');
-            $table->string('qr_code');
-            $table->integer('vendors_id')->nullable();
-            $table->string('assign_date')->nullable();
+            $table->integer('capacity');
+            $table->string('qr_code')->nullable();
+            $table->string('bkash_qr_code');
+            $table->integer('vendor_id')->nullable();
             $table->string('location')->nullable();
             $table->boolean('is_active')->default(0);
             $table->timestamps();

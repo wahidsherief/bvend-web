@@ -24,7 +24,7 @@ class SaveProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_categories_id' => 'required',
+            'product_category_id' => 'required',
             'name' => 'required',
             'description' => 'nullable',
             // 'image' => 'required|mimes:jpg,png,jpeg|image'

@@ -1,35 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
-use App\Http\Controllers\Controller;
-use App\Services\MachineService;
-use App\Services\TransactionService;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
-class PaymentController extends Controller
+class PaymentService
 {
-    protected $transaction_service;
-    protected $machine_service;
-
-    public function __construct(MachineService $machine_service, TransactionService $transaction_service)
-    {
-        $this->machine_service = $machine_service;
-        $this->transaction_service = $transaction_service;
-    }
-
-    public function bkashWebhook()
+    public function bkashWebhook(Request $request)
     {
         //payload
         $payload = (array) json_decode(file_get_contents('php://input'), true);
-
+        // $payload = $request->all();
+        \Log::info($payload);
 
         // headers
         // $messageType = $_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'];
         $messageType = 'Notification';
-
-
-        //logics
-
 
         //verify signature
         $signingCertURL = $payload['SigningCertURL'];
@@ -51,38 +38,14 @@ class PaymentController extends Controller
                     $url = curl_init($subscribeURL);
                     curl_exec($url);
                 } elseif ($messageType == "Notification") {
-                    $notification_data = $payload['Message'];
-                    // $transaction_data = $this->getTransactionData($notification_data);
-                    // $locks_data = $this->getLocksData($notification_data);
-                    // $transaction_saved = $this->transaction_service->saveTransaction($transaction_data);
-                    // if ($transaction_saved) {
-                    //     $this->machine_service->updateMachineLockers($locks_data);
-                    // }
-                    $this->writeLog('NotificationData-Message', $notification_data);
+                    $notificationData = $payload['Message'];
+                    $this->writeLog('NotificationData-Message', $notificationData);
+                    return $notificationData;
                 }
                 // }
             }
         }
     }
-
-    private function getTransactionData($notificationData)
-    {
-        return [
-            'machine_id' => 1,
-            'machine_type' => 'store',
-            'merchant_number' => $notificationData['creditShortCode'],
-            'customer_number' => '01900111222',
-            'vendor_id' => 1,
-            'refill_id' => 1,
-            'payment_method_id' => 1, // in future needs to be get from client
-            'discount' => 0,
-            'total_amount' => $notificationData['amount'],
-            'bkash_trx_id' => $notificationData['trxID'],
-            'invoice_no' => 'bvend-123',
-            'status' => $notificationData['transactionStatus']
-        ];
-    }
-
 
     private function writeLog($logName, $logData)
     {
