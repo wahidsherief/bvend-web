@@ -41,7 +41,7 @@ Route::group(['prefix' => 'admin'], function ($router) {
     Route::post('/login', [AdminController::class, 'login']);
 });
 
-Route::group(['middleware' => ['cors', 'jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin'], function ($router) {
+Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin'], function ($router) {
 
     Route::get('/', [AdminController::class, 'profile']);
     Route::post('/logout', [AdminController::class, 'logout']);
@@ -78,7 +78,7 @@ Route::group(['prefix' => 'vendor'], function ($router) {
     Route::post('/register', [VendorController::class, 'register']);
 });
 
-Route::group(['middleware' => ['cors', 'jwt.role:vendor', 'jwt.auth'], 'prefix' => 'vendor'], function ($router) {
+Route::group(['middleware' => ['jwt.role:vendor', 'jwt.auth'], 'prefix' => 'vendor'], function ($router) {
     Route::post('/logout', [VendorController::class, 'logout']);
     Route::get('/', [VendorController::class, 'profile']);
 
