@@ -45,11 +45,6 @@ class VendorController extends Controller
         return $this->authService->user();
     }
 
-    public function index()
-    {
-        return $this->service->all();
-    }
-
     public function update(UpdateVendorRequest $request, $id)
     {
         return $this->service->update($request, $id);

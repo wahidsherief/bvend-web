@@ -54,7 +54,15 @@ Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth'], 'prefix' => 'admin
     });
 
     Route::prefix('vendor')->group(function () {
-        Route::apiResource('/', AdminVendorController::class)->parameters(['' => 'vendor']);
+        Route::apiResource('/', AdminVendorController::class)->parameters(['' => 'vendor'])
+            ->names([
+                'index' => 'admin.vendor.index',
+                'store' => 'admin.vendor.store',
+                'show' => 'admin.vendor.show',
+                'update' => 'admin.vendor.update',
+                'destroy' => 'admin.vendor.destroy',
+            ]);
+
     });
 
 
