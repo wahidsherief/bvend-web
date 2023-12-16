@@ -35,7 +35,7 @@ use App\Http\Controllers\DashboardController;
 /** Auth routes -- starts */
 
 
-Route::middleware(['cors'])->group(function () {
+Route::group(['middleware' => 'cors'], function () {
 
     // auth - admin
     Route::group(['prefix' => 'admin'], function ($router) {
