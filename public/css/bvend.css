@@ -1,0 +1,132 @@
+* {
+    font-family: 'Ubuntu';
+}
+
+button:focus,
+button:active {
+    outline: none !important;
+    box-shadow: none;
+}
+
+input:focus,
+input:active {
+    outline: none !important;
+    box-shadow: none;
+}
+
+.btn,
+.btn:active,
+.btn:hover,
+.btn:focus {
+    outline: none !important;
+    box-shadow: none;
+}
+.flex-container {
+    display: flex;
+}
+.flex-container > div {
+    background-color: #ff6347;
+    margin: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+    font-size: 20px;
+    width: 100px;
+    line-height: 75px;
+    border-radius: 8px;
+    flex-direction: row;
+}
+.flex-container > div a {
+    text-decoration: none;
+}
+.profile-info {
+    width: 400px;
+    height: 300px;
+    float: left;
+}
+.profile-info img {
+    width: 150px;
+    height: 150px;
+    border: 2px solid grey;
+}
+.highlight {
+    font-weight: bolder;
+    color: red;
+}
+.table {
+    font-size: 12px;
+    text-align: center;
+}
+
+.btn-action-blue {
+    font-size: 16px;
+    font-weight: bold;
+    color: #689bd2;
+}
+
+.btn-action-red {
+    font-size: 16px;
+    font-weight: bold;
+    color: red;
+}
+
+.btn-action-green {
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+.table > tbody > tr > th {
+    vertical-align: middle;
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+.table-row td,
+.table-row th {
+    text-transform: capitalize;
+}
+
+.cap-text li {
+    text-transform: capitalize;
+}
+
+a.btn-bvend,
+.btn-bvend {
+    background-color: #007e33;
+    color: #fff;
+}
+
+.bg-bvend {
+    background-color: #007e33;
+    color: #fff;
+}
+
+.alert {
+    border-radius: 3px;
+}
+
+.bg-red-light {
+    background-color: #f799a7;
+}
+
+.list-shrinked {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
+.list-borderless {
+    border: 0 !important;
+}
+
+.product-list hr:last-child {
+    border: none;
+}
