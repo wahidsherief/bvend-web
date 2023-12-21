@@ -12,6 +12,8 @@ class Staff extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
+    protected $table = 'staffs';
+
     protected $fillable = [ 'name', 'email', 'password' ];
 
     protected $hidden = [ 'password', 'remember_token'];

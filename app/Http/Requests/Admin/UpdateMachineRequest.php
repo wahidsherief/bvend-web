@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ProductCategory;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductCategoryUpdateRequest extends FormRequest
+class UpdateMachineRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class ProductCategoryUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'category' => 'required'
+            //
         ];
     }
 }

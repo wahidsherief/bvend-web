@@ -10,13 +10,13 @@ class Transaction extends Model
     use HasFactory;
 
     protected $primaryKey = 'id';
+
     protected $guarded = ['id'];
 
-    protected $fillable = [
-        'machine_id', 'merchant_number', 'customer_number', 'refill_id',
-        'vendor_id', 'invoice_no', 'bkash_trx_id', 'total_amount', 'discount',
-        'payment_method_id', 'status'
-    ];
+    // public function getUpdatedAtAttribute($value)
+    // {
+    //     return \Carbon\Carbon::parse($value)->format('d F, Y, l');
+    // }
 
     public function user()
     {
@@ -26,5 +26,10 @@ class Transaction extends Model
     public function vendor()
     {
         return $this->hasOne('App\Vendor', 'id', 'vendor_id');
+    }
+
+    public function product()
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
     }
 }

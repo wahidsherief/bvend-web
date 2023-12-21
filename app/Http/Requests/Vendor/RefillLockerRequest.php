@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Vendor;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,7 +25,7 @@ class RefillLockerRequest extends FormRequest
     {
         return [
             'machine_id' => 'required',
-            'machine_type' => 'required',
+            'machine_type_id' => 'required',
             'machine_model' => 'required',
             'locker_id' => 'required',
             'product_id' => 'required',

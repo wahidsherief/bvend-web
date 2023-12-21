@@ -41,16 +41,16 @@ class PaymentController extends Controller
             $signatureDecoded = base64_decode($signature);
 
             $content = $this->getStringToSign($payload);
-            if ($content!='') {
+            if ($content != '') {
                 // $verified = openssl_verify($content, $signatureDecoded, $pubCert, OPENSSL_ALGO_SHA1);
                 // if ($verified=='1') {
-                if ($messageType=="SubscriptionConfirmation") {
+                if ($messageType == "SubscriptionConfirmation") {
                     $subscribeURL = $payload['SubscribeURL'];
                     $this->writeLog('Subscribe', $subscribeURL);
                     //subscribe
                     $url = curl_init($subscribeURL);
                     curl_exec($url);
-                } elseif ($messageType=="Notification") {
+                } elseif ($messageType == "Notification") {
                     $notification_data = $payload['Message'];
                     // $transaction_data = $this->getTransactionData($notification_data);
                     // $locks_data = $this->getLocksData($notification_data);
@@ -86,7 +86,7 @@ class PaymentController extends Controller
 
     private function writeLog($logName, $logData)
     {
-        file_put_contents(storage_path('./logs/bkash_logs/log-'.$logName.date("j.n.Y").'.json'), $logData, FILE_APPEND);
+        file_put_contents(storage_path('./logs/bkash_logs/log-' . $logName . date("j.n.Y") . '.json'), $logData, FILE_APPEND);
     }
 
     private function get_content($URL)
@@ -123,7 +123,7 @@ class PaymentController extends Controller
                     $stringToSign .= $key . "\n" . json_encode($message[$key]) . "\n";
                 }
             }
-            $this->writeLog('StringToSign', $stringToSign."\n");
+            $this->writeLog('StringToSign', $stringToSign . "\n");
         }
         return $stringToSign;
     }

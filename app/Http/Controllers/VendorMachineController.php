@@ -1,45 +1,80 @@
 <?php
 
-namespace App\Http\Controllers;
+// namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Machine;
-use App\Models\Refill;
-use App\Models\Vendor;
+// use App\Http\Controllers\Controller;
+// use Illuminate\Http\Request;
+// use App\Models\Machine;
+// use App\Models\Refill;
+// use App\Models\Vendor;
+// use App\Models\MachineProduct;
+// use Carbon\Carbon;
+// use App\Services\TransactionService;
 
-class VendorMachineController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index($id)
-    {
-        $machines = Machine::where('vendors_id', $id)->withSum('refills', 'price')->withSum('refills', 'quantity')->get();
-        return response()->json($machines, 200);
-        
-    }
+// class VendorMachineController extends Controller
+// {
+//     protected $transactionService;
 
-    public function getRefills($id)
-    {
-        $refills = Refill::where('machines_id', $id)->with('product')->get();
-        return response()->json($refills, 200);
-    }
+//     public function __construct(TransactionService $transactionService)
+//     {
+//         $this->transactionService = $transactionService;
+//     }
 
-    public function storeRefill(Request $request)
-    {
-        $data['products_id'] = $request->products_id;
-        $data['quantity'] = $request->quantity;
-        $data['price'] = $request->price;
-        $refills = Refill::where([
-            'machines_id' => $request->machines_id,
-            'row' => $request->row,
-            'tray' => $request->tray])->update($data);
+//     public function allMachines($vendorId)
+//     {
 
-        if ($refills) {
-            return $this->getRefills($request->machines_id);
-        }
-    }
-}
+//         $machines = $this->machinesByVendor($vendorId);
+
+//         return $machines
+//             ? successResponse('Machines fetched successfully.', $machines)
+//             : errorResponse('Machines fetch failed.');
+//     }
+
+//     public function setProductPrice(Request $request)
+//     {
+//         $isPriceSet = MachineProduct::where([
+//                 ['product_id', $request->product_id],
+//                 ['machine_id', $request->machine_id]
+//             ])->update(['price' => $request->price]);
+
+//         return $isPriceSet
+//                     ? successResponse('Price set successfully', $this->machinesByVendor($request->vendor_id))
+//                     : errorResponse('Price set failed');
+//     }
+
+
+//     public function saveRefill(Request $request)
+//     {
+//         $refillData = [
+//             'product_id' => $request->product_id,
+//             'quantity' => $request->quantity,
+//             'price' => $request->price,
+//         ];
+
+//         $isRefilled = Refill::where([
+//             'machine_id' => $request->machineId,
+//             'row_no' => $request->row_no,
+//             'column_no' => $request->column_no
+//         ])->update($refillData);
+
+//         if(!$isRefilled) {
+//             return errorResponse('Refill failed.');
+//         }
+
+//         $machines = $this->machinesByVendor($request->vendor_id);
+
+//         return $machines
+//             ? successResponse('Refilled successfully.', $machines)
+//             : errorResponse('Refill failed.', $machines);
+//     }
+
+//     private function machinesByVendor($vendorId)
+//     {
+
+//         $machines = Machine::where('vendor_id', $vendorId)
+//         ->with(['machineType', 'products.category', 'refills.product', 'transactions.products'])
+//         ->get();
+
+//         return $this->transactionService->allTransactionsByMachines($machines);
+//     }
+// }

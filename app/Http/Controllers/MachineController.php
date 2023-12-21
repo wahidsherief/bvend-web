@@ -4,111 +4,124 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Machine;
-use App\Services\BaseService;
+use App\Models\MachineProduct;
+use App\Models\Refill;
+use App\Services\MachineService;
 use Illuminate\Http\Request;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Admin\SaveMachineRequest;
+use App\Http\Requests\Admin\UpdateMachineRequest;
 
 class MachineController extends Controller
 {
     protected $service;
-    protected $machine;
 
-    public function __construct(BaseService $service, Machine $machine)
+    public const ofAdmin = ['machineType', 'vendor', 'products.category', 'transactions.product'];
+
+    public const ofVendor = ['machineType','products.category', 'transactions.product', 'refills.product'];
+
+
+    public function __construct(MachineService $service)
     {
-        // $this->middleware('auth:admin');
         $this->service = $service;
-        $this->machine = $machine;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function getMachines()
     {
-        return response()->json($this->machine->with('vendor')->get(), 200);
+        $this->service->withRelations(self::ofAdmin);
+
+        $machines = $this->service->all();
+
+        return $machines ?
+            successResponse('Machines fetched successfully', $machines)
+            : errorResponse('Fetching machine failed');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function createMachine(SaveMachineRequest $request)
     {
-        $data = $request->all();
+        $this->service->withRelations(self::ofAdmin);
 
-        $machine_code = mt_rand(100000, 999999);
+        $machines = $this->service->save($request);
 
-        $qr_code =  $this->generateQRCode($machine_code, $request->machine_type);
+        return $machines ?
+            successResponse('Machine created successfully', $machines)
+            : errorResponse('Machine create falied');
+    }
 
-        if (strlen($qr_code) > 0) {
-            $data['machine_code'] = $machine_code;
-            $data['qr_code'] = $qr_code;
-            $data['is_active'] = $request->is_active === true ? 1 : 0;
-            return $this->machine->create($data) && $this->index();
+    public function updateMachine(UpdateMachineRequest $request, $id)
+    {
+        $this->service->withRelations(self::ofAdmin);
+
+        $machines = $this->service->update($request, $id);
+
+        return $machines ?
+            successResponse('Machine updated successfully', $machines)
+            : errorResponse('Machine update failed');
+    }
+
+    public function deleteMachine($id)
+    {
+        $this->service->withRelations(self::ofAdmin);
+
+        $machines = $this->service->delete($id);
+
+        return $machines ?
+            successResponse('Machine deleted successfully', $machines)
+            : errorResponse('Machine delete failed');
+    }
+
+    public function getVendorMachines($vendorId)
+    {
+        $machines = $this->vendorMachines($vendorId);
+
+        return $machines ?
+            successResponse('Machines fetched successfully', $machines)
+            : errorResponse('Machine fetch failed');
+    }
+
+    public function setMachineProductPrice(Request $request)
+    {
+        $isPriceSet = MachineProduct::where([
+                ['product_id', $request->product_id],
+                ['machine_id', $request->machine_id]
+            ])->update(['price' => $request->price]);
+
+        return $isPriceSet
+                    ? successResponse('Price set successfully', $this->vendorMachines($request->vendor_id))
+                    : errorResponse('Price set failed');
+    }
+
+    public function saveMachineRefill(Request $request)
+    {
+        $refillData = [
+            'product_id' => $request->product_id,
+            'quantity' => $request->quantity,
+            'price' => $request->price,
+        ];
+
+        $isRefilled = Refill::where([
+            'machine_id' => $request->machineId,
+            'row_no' => $request->row_no,
+            'column_no' => $request->column_no
+        ])->update($refillData);
+
+        if(!$isRefilled) {
+            return errorResponse('Refill failed.');
         }
+
+        $machines = $this->vendorMachines($request->vendor_id);
+
+        return $machines
+            ? successResponse('Refilled successfully.', $machines)
+            : errorResponse('Refill failed.', $machines);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    private function vendorMachines($vendorId)
     {
-        //
-    }
+        $ofVendor = ['vendor_id' => $vendorId];
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $data = $request->all();
-        $data['is_active'] = $request->is_active === true ? 1 : 0;
-        $updated = $this->machine->find($id)->update($data);
-        if ($updated) {
-            return $this->index();
-        }
-    }
+        $this->service->withRelations(self::ofVendor)->withConditions($ofVendor);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $this->machine->find($id)->delete();
-        return response('success', 204);
-    }
-
-    private function generateQRCode($machine_code, $type)
-    {
-        $path = config('global.qrcode_image_path');
-        try {
-            $code = 'BVENDMACHINECODE-' . $machine_code;
-            $qr_code = $type . '-' . $machine_code . '.png';
-            $url = $path . $qr_code;
-            QrCode::format('png')
-                ->margin(0)
-                ->size(500)
-                ->generate($code, $url);
-
-            return $qr_code;
-        } catch (\Exception $e) {
-            report($e);
-            return false;
-        }
+        return $this->service->all();
     }
 }

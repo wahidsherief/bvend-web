@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductStoreRequest extends FormRequest
+class SaveMachineTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,7 @@ class ProductStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_category_id' => 'required',
-            'name' => 'required',
-            'description' => 'required',
-            'image' => 'required|mimes:jpg,png,jpeg|image'
+            'name' => 'required|unique:machine_types'
         ];
     }
 }

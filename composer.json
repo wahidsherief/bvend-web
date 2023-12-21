@@ -16,7 +16,8 @@
         "salmanzafar/laravel-mqtt": "^2.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "timwassenburg/laravel-service-generator": "^1.0",
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.0",
+        "nunomaduro/termwind": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
@@ -33,7 +34,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -61,6 +65,7 @@
         }
     },
     "config": {
+        "platform-check": false,
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,

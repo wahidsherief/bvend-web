@@ -11,13 +11,13 @@ class JWTRoleAuth extends BaseMiddleware {
     public function handle($request, Closure $next, $role = null)
     {
         try {
-            $this->auth->parseToken()->getClaim('role');
+            $token_role = $this->auth->parseToken()->getClaim('role');
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+            return response()->json(['error' => 'Unauthenticated'], 401);
         }
         
-        if ($token_role = $role) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+        if ($token_role != $role) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
         }
         
         return $next($request);

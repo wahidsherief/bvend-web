@@ -6,41 +6,78 @@ use App\Models\Transaction;
 
 class TransactionService extends BaseService
 {
-    protected $locker_machine_transaction;
-    protected $machine_service;
-    protected $transaction_locker;
+    public function transactionsByMachine($machine)
+    {
+        $transactionsGroupByDate = $machine->transactions->groupBy(function ($transaction) {
+            return \Carbon\Carbon::parse($transaction->updated_at)->format('Y-m-d');
+        });
 
-    public function __construct(
-        Transaction $transaction,
-        MachineService $machine_service
-    ) {
-        $this->transaction = $transaction;
-        $this->machine_service = $machine_service;
+        $formattedTransactions = $this->formatTransactions($transactionsGroupByDate);
+
+        unset($machine->transactions);
+
+        $machine->transactions = $formattedTransactions;
+
+        return $machine;
     }
 
-    public function getAllTransactionsOfVendor($vendor_id, $paginate)
+    public function transactionsByMachines($machines)
     {
-        $transactions = $this->transaction->where(['vendor_id' => $vendor_id, 'status' => 'success'])->latest()->paginate($paginate);
+        $transactions = $machines->map(function ($machine) {
+            return $this->transactionsByMachine($machine);
+        });
 
         return $transactions;
     }
 
-    // public function getSpecificTransactionOfVendor($vendor_id, $transaction_id)
-    // {
-    //     $transaction = Transaction::with(['lockers.refill.product.category', 'lockers.refill.product.brand', 'vendor'])
-    //     ->where(['vendor_id' => $vendor_id, 'id' => $transaction_id])->first();
+    private function formatTransactions($transactions)
+    {
+        $formattedTransactions = [];
 
-    //     // $transaction->machine = Machine::where($vendor_id, $transaction->machine_id);
+        foreach ($transactions as $date => $transactionGroup) {
+            $sumOfTotalAmounts = $transactionGroup->sum('total_amount');
+
+            $formattedTransaction = $this->mapResponse($transactionGroup);
+
+            $formattedTransactions[] = [
+                'date' => readableDate($date),
+                'data' => $formattedTransaction->all(),
+                'total_amount' => $sumOfTotalAmounts,
+            ];
+        }
+
+        return $formattedTransactions;
+    }
+
+    private function mapResponse($transaction)
+    {
+        return $transaction->map(function ($data) {
+            return [
+                'id' => $data->id,
+                'machine_id' => $data->machine_id,
+                'vendor_id' => $data->vendor_id,
+                'bkash_merchant_number' => $data->bkash_merchant_number,
+                'customer_number' => $data->customer_number,
+                'invoice_no' => $data->invoice_no,
+                'bkash_trx_id' => $data->bkash_trx_id,
+                'total_amount' => $data->total_amount,
+                'discount' => $data->discount,
+                'payment_method_id' => $data->payment_method_id,
+                'status' => $data->status,
+                'sold_at' => \Carbon\Carbon::parse($data->updated_at)->format('h:i A'),
+                'product' => $data->product
+            ];
+        });
+    }
+
+
+    // public function saveTransaction(array $attributes)
+    // {
+    //     $transaction = $this->transaction->newInstance()->fill($attributes);
+
+    //     $transaction->save();
 
     //     return $transaction;
     // }
 
-    public function saveTransaction(array $attributes)
-    {
-        $transaction = $this->transaction->newInstance()->fill($attributes);
-
-        $transaction->save();
-
-        return $transaction;
-    }
 }

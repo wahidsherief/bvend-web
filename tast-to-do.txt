@@ -1,0 +1,20 @@
+1. bvend machine code - need to modify
+
+2. need to use in assign product:
+
+    // private function createMachine($request)
+    // {
+    //     $machine = Machine::create($request);
+
+    //     if ($request->categories) {
+    //         foreach ($request->categories as $category) {
+    //             $machine->productCategories()->attach($category);
+    //         }
+    //     }
+
+    //     return $machine;
+    // }
+
+3. need to check the validations for all
+4. remove timestamps of machine type
+5. refractor api routes - check repeat routes for auth users

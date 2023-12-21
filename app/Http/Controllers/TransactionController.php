@@ -3,65 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
-    protected $service;
-    protected $transaction;
+    public function __construct() {}
 
-    public function __construct(BaseService $service, Transaction $transaction)
+    public function all()
     {
-        // $this->middleware('auth:admin');
-        $this->service = $service;
-        $this->transaction = $transaction;
+        $transactions = Transaction::all();
+
+        return $transactions
+            ? successResponse('Transaction fetched successfully.', $transactions)
+            : errorResponse('Transaction fetch failed.');
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function getByVendor($id)
     {
-        return TransactionResource::collection($this->transaction->all())->response(200);
+        $transactions = Transaction::where('machine_id', $id)
+            ->orderBy('updated_at')
+            ->get()
+            ->groupBy(function ($date) {
+                return \Carbon\Carbon::parse($date->updated_at)->format('Y-m-d');
+            });
+
+        return $transactions
+            ? successResponse('Transaction fetched successfully.', $transactions)
+            : errorResponse('Transaction fetch failed.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $stored = $this->transaction->create($request->all());
-        return response(new TransactionResource($stored), 201);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        // $this->transaction->find($id)->delete();
-        // return response('success', 204);
-    }
 }
